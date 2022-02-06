@@ -101,3 +101,24 @@ body {
   background-color: var(--main-bg-color);
   transition: all 0.3s ease-in;
 }
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  height: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.footer > a {
+  margin: 0 2rem;
+  text-decoration: none;
+  color: var(--border-color);
+  font-weight: 900;
+}
+
+.footer > p {
+  color: var(--border-color);
+  font-weight: 700;
+}
