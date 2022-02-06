@@ -8,21 +8,27 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <section class="start-menu">
-    <h1>Tic Tac Toe</h1>
-    <div class="player-character">
-      <span class="player1">Player 1 : X</span>
-      <span class="player2">Player 2 : O</span>
+    <div class="border-bg">
+      <div class="border-edge"></div>
     </div>
+    <h1>Tic Tac Toe</h1>
     <form action="" class="player-name-form">
       <label for="player1">Name:</label>
-      <input type="text" id="player1-name" name="player-name" placeholder="Player 1"><br>
+      <input type="text" id="player1-name" name="player-name" placeholder="[X] Player 1"><br>
       <label for="player2">Name:</label>
-      <input type="text" id="player2-name" name="player-name" placeholder="Player 2"><br>
-      <input type="button" value="Play">
+      <input type="text" id="player2-name" name="player-name" placeholder="[O] Player 2"><br>
+      <div class="form-buttons">
+        <div>
+          <input type="button" value="V.S. Computer">
+        </div>
+        <div>
+          <input type="button" value="Play">
+        </div>
+      </div>      
     </form>
   </section>
   <section class="gameplay">
@@ -30,8 +36,5 @@
 
     </div>
   </section>
-  <footer class="footer">
-
-  </footer>
 </body>
 </html>
