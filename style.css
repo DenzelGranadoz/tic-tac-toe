@@ -21,7 +21,7 @@ body {
 .start-menu{
   height: 100vh;
   width: 100vw;
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -83,7 +83,7 @@ body {
   transition: all 0.3s ease-in;
 }
 
-.border-bg {
+.start-menu-border-bg {
   position: absolute;
   height: 650px;
   width: 1100px;
@@ -94,7 +94,7 @@ body {
   border: 5px solid var(--border-color);
 }
 
-.border-edge {
+.start-menu-border-edge {
   position: relative;
   top: -17px;
   left: -30px;
@@ -104,6 +104,104 @@ body {
   border-radius: 150px;
 }
 
+/* Gameplay menu page contents */
+.gameplay-menu {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--main-bg-color);
+}
+
+.gameplay-menu-header {
+  text-align: center;
+}
+
+.gameplay-menu-header h1 {
+  font-size: 6rem;
+  font-weight: 900;
+  border-bottom: 3px solid var(--border-color);
+  color: var(--font-color);
+}
+
+.gameplay-content {
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.message-display {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 700;
+  padding: 1rem 0;
+}
+
+.board-container {
+  display: grid;
+  justify-content: center;
+  padding: 1rem 0;
+  grid-template-columns: repeat(3, auto);
+}
+
+.board-cell {
+  width: 120px;
+  height: 120px;
+  background-color: var(--board-color);
+  border: 2px solid var(--border-color);
+  text-align: center;
+  font-family: 'Rowdies', cursive;
+  font-size: 3rem;
+  padding-top: 1.6rem;
+}
+
+.board-cell:hover {
+  opacity: 50%;
+}
+
+.board-cell:first-child,
+.board-cell:nth-child(2),
+.board-cell:nth-child(3) {
+  border-top: none;
+}
+
+.board-cell:nth-child(3n + 0) {
+  border-right: none;
+}
+
+.board-cell:nth-child(3n + 1) {
+  border-left: none;
+}
+
+.board-cell:last-child,
+.board-cell:nth-child(7),
+.board-cell:nth-child(8) {
+  border-bottom: none;
+}
+
+.gameplay-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gameplay-buttons button {
+  width: 10rem;
+  height: 3.5rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0.8rem;
+  color: var(--font-color);
+  background-color: var(--secondary-color);
+  border: 3px solid var(--border-color);
+}
+
+.gameplay-buttons button:hover {
+  background-color: var(--main-bg-color);
+  transition: all 0.3s ease-in;
+}
+
+/* footer */
 .footer {
   position: absolute;
   bottom: 0;
@@ -114,24 +212,25 @@ body {
 }
 
 .footer > a {
-  margin: 0 2rem;
+  margin-right: 1rem;
   text-decoration: none;
   color: var(--border-color);
   font-weight: 900;
 }
 
 .footer > p {
+  margin-right: 1.5rem;
   color: var(--border-color);
   font-weight: 700;
 }
 
 /* Large Devices */
 @media only screen and (max-width: 1200px) {
-  .border-bg {
+  .start-menu-border-bg {
     height: 550px;
     width: 950px;
   }
-  .border-edge {
+  .start-menu-border-edge {
     height: 575px;
     width: 1000px;
   }
@@ -148,15 +247,21 @@ body {
   .player-name-form input[type=text] {
     font-size: 1.3rem;
   }
+  .gameplay-menu-header h1 {
+    font-size: 5.5rem;
+  }
+  .message-display {
+    font-size: 3rem;
+  }
 }
 
 /* Tablet Support  */
 @media only screen and (max-width: 1000px) {
-  .border-bg {
+  .start-menu-border-bg {
     height: 450px;
     width: 770px;
   }
-  .border-edge {
+  .start-menu-border-edge {
     height: 475px;
     width: 820px;
   }
@@ -176,14 +281,23 @@ body {
   .form-buttons input[type=button] {
     font-size: 0.7rem;
   }
+  .gameplay-menu-header h1 {
+    font-size: 5rem;
+  }
+  .message-display {
+    font-size: 2rem;
+  }
+  .gameplay-buttons button {
+    font-size: 1.2rem;
+  }
 }
 
 @media only screen and (max-width: 768px) {
-  .border-bg {
+  .start-menu-border-bg {
     height: 400px;
     width: 700px;
   }
-  .border-edge {
+  .start-menu-border-edge {
     height: 425px;
     width: 750px;
   }
@@ -203,14 +317,23 @@ body {
   .form-buttons input[type=button] {
     font-size: 0.5rem;
   }
+  .gameplay-menu-header h1 {
+    font-size: 4rem;
+  }
+  .message-display {
+    font-size: 1.5rem;
+  }
+  .gameplay-buttons button {
+    font-size: 1rem;
+  }
 }
 
 /* smartphone support  */
 @media only screen and (max-width: 600px) {
-  .border-bg {
+  .start-menu-border-bg {
     display: none;
   }
-  .border-edge {
+  .start-menu-border-edge {
     display: none;
   }
   .start-menu h1 {
@@ -229,7 +352,13 @@ body {
   .form-buttons input[type=button] {
     font-size: 0.4rem;
   }
+  .gameplay-menu-header h1 {
+    font-size: 3rem;
+  }
   .footer {
     font-size: 0.7rem;
+  }
+  .gameplay-buttons button {
+    font-size: 0.8rem;
   }
 }

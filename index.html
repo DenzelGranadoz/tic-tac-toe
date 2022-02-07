@@ -8,13 +8,10 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;400;700;900&family=Rowdies&display=swap" rel="stylesheet">
 </head>
 <body>
   <section class="start-menu">
-    <div class="border-bg">
-      <div class="border-edge"></div>
-    </div>
     <h1>Tic Tac Toe</h1>
     <form action="" class="player-name-form">
       <label for="player1">Name:</label>
@@ -30,15 +27,39 @@
         </div>
       </div>      
     </form>
+    <div class="start-menu-border-bg">
+      <div class="start-menu-border-edge"></div>
+    </div>
   </section>
-  <section class="gameplay">
-    <div class="grid-container">
-
+  <section class="gameplay-menu">
+    <header class="gameplay-menu-header">
+      <h1>Tic Tac Toe</h1>
+    </header>
+    <div class="gameplay-content">
+      <div class="message-display">
+        <span>Your</span>
+        <span>turn</span>
+      </div>
+      <div class="board-container">
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+        <div class="board-cell"></div>
+      </div>
+      <div class="gameplay-buttons">
+        <button type="button">Main-Menu</button>
+        <button type="button">Play Again</button>
+      </div>
     </div>
   </section>
   <footer class="footer">
     <a href="https://github.com/DenzelGranadoz" class="href" target="_blank">Denzel Granadoz</a>
-    <p>|</p>
+    <p>/</p>
     <a href="https://github.com/DenzelGranadoz" class="href" target="_blank">Source Code</a>
   </footer>
 </body>
