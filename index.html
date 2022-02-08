@@ -11,18 +11,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;400;700;900&family=Rowdies&display=swap" rel="stylesheet">
 </head>
 <body>
-  <section class="start-menu">
+  <section class="start-menu" id="start-screen">
     <h1>Tic Tac Toe</h1>
-    <form action="" class="player-name-form">
+    <form action="" class="player-name-form" id="start-screen-form">
       <label for="player1">Name:</label>
       <input type="text" id="player1-name" name="player-name" placeholder="[X] Player 1"><br>
       <label for="player2">Name:</label>
       <input type="text" id="player2-name" name="player-name" placeholder="[O] Player 2"><br>
-      <div class="form-buttons">
-        <div>
+      <!-- different level of AI -->
+      <div class="none" id='difficulty-container'>
+        <label for="difficulty">Level:</label>
+        <select id="difficulty" name="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="minmax">Unbeatable</option>
+        </select>
+      </div>
+      <div class="form-buttons" id="form-play-buttons">
+        <div class="form-button-div" id="computer">
           <input type="button" value="V.S. Computer">
         </div>
-        <div>
+        <div class="form-button-div none" id="human">
+          <input type="button" value="Two Players">
+        </div>
+        <div class="form-button-div" id="play" >
           <input type="button" value="Play">
         </div>
       </div>      
@@ -31,16 +43,16 @@
       <div class="start-menu-border-edge"></div>
     </div>
   </section>
-  <section class="gameplay-menu">
+  <section class="gameplay-menu" id="game-screen">
     <header class="gameplay-menu-header">
       <h1>Tic Tac Toe</h1>
     </header>
     <div class="gameplay-content">
-      <div class="message-display">
+      <div class="message-display" id="announcement-display">
         <span>Your</span>
         <span>turn</span>
       </div>
-      <div class="board-container">
+      <div class="board-container" id="game-board">
         <div class="board-cell"></div>
         <div class="board-cell"></div>
         <div class="board-cell"></div>
@@ -52,8 +64,8 @@
         <div class="board-cell"></div>
       </div>
       <div class="gameplay-buttons">
-        <button type="button">Main-Menu</button>
-        <button type="button">Play Again</button>
+        <button type="button" id="main-menu">Main-Menu</button>
+        <button type="button" id="play-again">Play Again</button>
       </div>
     </div>
   </section>
@@ -62,5 +74,6 @@
     <p>/</p>
     <a href="https://github.com/DenzelGranadoz" class="href" target="_blank">Source Code</a>
   </footer>
+  <script src="script.js"></script>
 </body>
 </html>

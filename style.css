@@ -21,7 +21,7 @@ body {
 .start-menu{
   height: 100vh;
   width: 100vw;
-  display: none;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -36,7 +36,6 @@ body {
 }
 
 .player-name-form {
-  height: 10rem;
   width: 20rem;
   z-index: 1;
 }
@@ -53,6 +52,19 @@ body {
   border: 4px solid var(--border-color);
   border-radius: 40px;
   font-size: 1.6rem;
+  font-weight: 700;
+}
+
+#difficulty {
+  width: 60%;
+  padding: 4px 0 4px 14px;
+  margin: 0 0 28px 26px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--font-color);
+  background-color: var(--secondary-color);
+  border: 4px solid var(--border-color);
+  border-radius: 40px;
 }
 
 .form-buttons {
@@ -63,7 +75,7 @@ body {
   display: inline-flex;
 }
 
-.form-buttons div {
+.form-button-div {
   flex-grow: 1;
   flex-basis: 0;
   align-items: stretch;
@@ -83,6 +95,10 @@ body {
   transition: all 0.3s ease-in;
 }
 
+.none { 
+  display: none;
+}
+
 .start-menu-border-bg {
   position: absolute;
   height: 650px;
@@ -91,7 +107,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: var(--main-bg-color);
-  border: 5px solid var(--border-color);
+  border: 5px solid var(--board-color);
 }
 
 .start-menu-border-edge {
@@ -104,7 +120,7 @@ body {
   border-radius: 150px;
 }
 
-/* Gameplay menu page contents */
+/* Gameplay menu page contents ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss*/
 .gameplay-menu {
   height: 100vh;
   width: 100vw;
@@ -159,6 +175,11 @@ body {
   opacity: 50%;
 }
 
+.x-cell,
+.o-cell {
+  cursor: not-allowed;
+}
+
 .board-cell:first-child,
 .board-cell:nth-child(2),
 .board-cell:nth-child(3) {
@@ -191,7 +212,7 @@ body {
   font-size: 1.4rem;
   font-weight: 700;
   margin: 0.8rem;
-  color: var(--font-color);
+  color: black;
   background-color: var(--secondary-color);
   border: 3px solid var(--border-color);
 }
