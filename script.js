@@ -13,7 +13,7 @@ const DomElement = (() => {
   const labelPlayer2 = startScreenForm.getElementsByTagName('label')[1];
   const difficultyContainer = document.getElementById('difficulty-container');
   const difficulty = document.getElementById('difficulty');
-  const formPlayButtons = document.getElementById('form-play-buttons');
+  // const formPlayButtons = document.getElementById('form-play-buttons');
   const playHuman = document.getElementById('human');
   const playComputer = document.getElementById('computer');
   const playButton = document.getElementById('play');
@@ -21,15 +21,11 @@ const DomElement = (() => {
   const messageDisplay = document.getElementById('announcement-display');
   const boardGame = document.getElementById('game-board');
   const boardCells = document.querySelectorAll('.board-cell');
-  const gameplayButtons = document.querySelector('.gameplay-buttons');
   const openStartScreen = document.getElementById('main-menu');
   const playAgain = document.getElementById('play-again');
 
-  const addNone = (element) => {
-    return element.classList.add('none');
-  };
-  const removeNone = (element) => {
-    return element.classList.remove('none');
+  const toggleNone = (element) => {
+    return element.classList.toggle('none');
   };
 
   return {
@@ -40,7 +36,7 @@ const DomElement = (() => {
     labelPlayer2,
     difficultyContainer,
     difficulty,
-    formPlayButtons,
+    // formPlayButtons,
     playHuman,
     playComputer,
     playButton,
@@ -48,37 +44,38 @@ const DomElement = (() => {
     messageDisplay,
     boardGame,
     boardCells,
-    gameplayButtons,
     openStartScreen,
     playAgain,
-    addNone,
-    removeNone
+    // addNone,
+    // removeNone,
+    toggleNone
   };
 })();
 
 const MainMenu = (() => {
   // play against computer and human toggle selection
-  const humanSelection = () => {
-    DomElement.addNone(DomElement.labelPlayer2);
-    DomElement.addNone(DomElement.player2);
-    DomElement.addNone(DomElement.playComputer);
-    DomElement.removeNone(DomElement.difficultyContainer);
-    DomElement.removeNone(DomElement.playHuman);
-    DomElement.player1.style.margin = '0 0 0 10px';
-
+  const toggleSelection = () => {
+    DomElement.toggleNone(DomElement.labelPlayer2);
+    DomElement.toggleNone(DomElement.player2);
+    DomElement.toggleNone(DomElement.playComputer);
+    DomElement.toggleNone(DomElement.difficultyContainer);
+    DomElement.toggleNone(DomElement.playHuman);
+    if(DomElement.playHuman.classList.contains('none')) {
+      DomElement.player1.style.margin = '0 0 25px 10px';
+    } else {
+      DomElement.player1.style.margin = '0 0 0 10px';
+    }
   };
 
-  const computerSelection = () => {
-    DomElement.removeNone(DomElement.labelPlayer2);
-    DomElement.removeNone(DomElement.player2);
-    DomElement.removeNone(DomElement.playComputer);
-    DomElement.addNone(DomElement.difficultyContainer);
-    DomElement.addNone(DomElement.playHuman);
-    DomElement.player1.style.margin = '0 0 25px 10px';
+  DomElement.playComputer.addEventListener('click', toggleSelection);
+  DomElement.playHuman.addEventListener('click', toggleSelection);
+
+  const showGameScreen = () => {
+    DomElement.addNone(DomElement.startScreen);
   };
 
-  DomElement.playComputer.addEventListener('click', humanSelection);
-  DomElement.playHuman.addEventListener('click', computerSelection);
+  DomElement.playButton.addEventListener('click', showGameScreen);
 })();
 
-
+// DomElement.removeNone(DomElement.openStartScreen);
+// DomElement.removeNone(DomElement.playAgain);
