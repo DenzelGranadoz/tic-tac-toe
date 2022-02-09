@@ -24,7 +24,8 @@
         <select id="difficulty" name="difficulty">
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
-          <option value="minmax">Unbeatable</option>
+          <option value="unbeatable">Unbeatable</option>
+          <option value="asian">Asian</option>
         </select>
       </div>
       <div class="form-buttons" id="form-play-buttons">
@@ -48,9 +49,13 @@
       <h1>Tic Tac Toe</h1>
     </header>
     <div class="gameplay-content">
-      <div class="message-display" id="announcement-display">
-        <span>Your</span>
-        <span>turn</span>
+      <div class="message-container">
+        <div class="player-name-score">
+          <span>Player One: 0</span>
+        </div>
+        <div class="player-name-score">
+          <span>Player two: 0</span>
+        </div>
       </div>
       <div class="board-container" id="game-board">
         <div class="board-cell"></div>
@@ -64,8 +69,8 @@
         <div class="board-cell"></div>
       </div>
       <div class="gameplay-buttons">
-        <button type="button" id="main-menu">Main-Menu</button>
-        <button type="button" id="play-again">Play Again</button>
+          <button class="none" type="button" id="main-menu">Main-Menu</button>
+          <button class="none" type="button" id="play-again">Play Again</button>
       </div>
     </div>
   </section>

@@ -57,8 +57,8 @@ body {
 
 #difficulty {
   width: 60%;
-  padding: 4px 0 4px 14px;
-  margin: 0 0 28px 26px;
+  padding: 2px 0 2px 14px;
+  margin: 0 0 26px 24px;
   font-size: 1.5rem;
   font-weight: 900;
   color: var(--font-color);
@@ -120,7 +120,7 @@ body {
   border-radius: 150px;
 }
 
-/* Gameplay menu page contents ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss*/
+/* Gameplay menu page contents */
 .gameplay-menu {
   height: 100vh;
   width: 100vw;
@@ -146,11 +146,24 @@ body {
   flex-grow: 1;
 }
 
-.message-display {
-  text-align: center;
-  font-size: 3rem;
-  font-weight: 700;
-  padding: 1rem 0;
+.message-container{
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.player-name-score {
+  font-size: 2rem;
+  font-family: 'Rowdies', cursive;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem 0;
+  border-radius: 50px;
+  border: 4px solid var(--border-color);
+  background-color: var(--main-bg-color);
+}
+
+.player-name-score:hover {
+  background-color: var(--board-color);
 }
 
 .board-container {
