@@ -1,5 +1,3 @@
-console.log("Hello der, inspector");
-
 //DOM grab module
 const DomElement = (() => {
   const startScreen = document.getElementById('start-screen');
@@ -54,24 +52,29 @@ const DomElement = (() => {
 //start screen content
 const MainMenu = (() => {
   // play against computer and human toggle selection
+  let toggled = false;
   const toggleSelection = () => {
     DomElement.toggleNone(DomElement.labelPlayer2);
     DomElement.toggleNone(DomElement.player2);
     DomElement.toggleNone(DomElement.playComputer);
     DomElement.toggleNone(DomElement.difficultyContainer);
     DomElement.toggleNone(DomElement.playHuman);
-    if(DomElement.playHuman.classList.contains('none')) {
-      DomElement.player1.style.margin = '0 0 25px 10px';
-    } else {
+    if(DomElement.playComputer.classList.contains('none')) { 
       DomElement.player1.style.margin = '0 0 0 10px';
+      toggled = true //true = bot
+    } else {
+      DomElement.player1.style.margin = '0 0 25px 10px';
+      toggled = false
     }
   };
 
   DomElement.playComputer.addEventListener('click', toggleSelection);
   DomElement.playHuman.addEventListener('click', toggleSelection);
 
+  //changes screen and activates board cells
   const showGameScreen = () => {
     DomElement.toggleNone(DomElement.startScreen);
+    gameBoard.addBoardListeners();  
   };
 
   DomElement.playButton.addEventListener('click', showGameScreen);
@@ -80,19 +83,28 @@ const MainMenu = (() => {
     return DomElement.difficulty.value;
   };
 
-  const playerType = () => {
+  const getPlayerType = () => {
     let playerType = 'human';
-    if(DomElement.playComputer.contains.classList('none')) {
-      playerType = 'bot'
+    if(toggled == true) {
+      playerType = 'bot';
     }
-    return { 
-      playerType
-    }
+    return playerType;
   };
+
+  const getPlayer1Name = () => {
+    return DomElement.player1.value;
+  }
+
+  const getPlayer2Name = () => {
+    return DomElement.player2.value;
+  }
   
   return {
+    toggleSelection,
     botDifficulty,
-    playerType
+    getPlayerType,
+    getPlayer1Name,
+    getPlayer2Name
   }
 })();
 
@@ -126,7 +138,17 @@ const Player = (sign, name) => {
 }
 
 
+// if getsign == X innerhtml x else vice versa -chek
+//udpate array
+//render
 
+//check win conditions
+
+
+//update player turn
+//change player name
+//change bot name
+//refactor code to avoid repeating
 const gameBoard = (() => {
   const board = new Array(9);
 
@@ -142,13 +164,37 @@ const gameBoard = (() => {
   ];
 
   const activateCell = (e) => {
-    console.log(e.target.id);
-    DomElement.boardCells[e.target.id].removeEventListener('click', activateCell);
-    DomElement.nonSelectable(DomElement.boardCells[e.target.id]);
+    updateMark(e);
+    deactivateCell(e.target.id);
   };
 
-  DomElement.boardCells.forEach((cell) => {
-    cell.addEventListener('click', activateCell);
-  });
+  //this function will be moved to display UI controller
+  let boardMark = 'O';
+  const updateMark = (e) => {
+    if(boardMark === 'O') {
+      e.target.innerHTML ='X';
+      boardMark = 'X';
+    } 
+    else {
+      e.target.innerHTML = 'O';
+      boardMark = 'O';
+    }
+    board[e.target.id] = boardMark;
+  };
+
+  const deactivateCell = (cellNum) => {
+    DomElement.boardCells[cellNum].removeEventListener('click', activateCell);
+    DomElement.nonSelectable(DomElement.boardCells[cellNum]);
+  };
+
+  const addBoardListeners = () => {
+    DomElement.boardCells.forEach((cell) => {
+      cell.addEventListener('click', activateCell);
+    });
+  };
+
+  return {
+    addBoardListeners
+  }
 })();
 
