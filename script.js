@@ -93,11 +93,11 @@ const MainMenu = (() => {
 
   const getPlayer1Name = () => {
     return DomElement.player1.value;
-  }
+  };
 
   const getPlayer2Name = () => {
     return DomElement.player2.value;
-  }
+  };
   
   return {
     toggleSelection,
@@ -137,14 +137,10 @@ const Player = (sign, name) => {
   };
 }
 
-
 // if getsign == X innerhtml x else vice versa -chek
-//udpate array
-//render
-
+//udpate array - chek
 //check win conditions
-
-
+//render
 //update player turn
 //change player name
 //change bot name
@@ -156,32 +152,80 @@ const gameBoard = (() => {
     [0,1,2],
     [3,4,5],
     [6,7,8],
-    [1,3,6],
+    [0,3,6],
     [1,4,7],
     [2,5,8],
     [0,4,8],
     [2,4,6]          
   ];
+  //to-do
+  //have an array go thru board indexes
+  //if X den take index put it into x array
+  //if O, vice versa step 2
+  //check win conditions from there with .Contains or something - step por
+  let x_array = [],
+      o_array = [];
+
+  const checkWinner = (playerMark) => {
+    for(let i = 0; i < board.length; i++) {
+      if(board[i] != undefined && board[i] === 'X') {
+        x_array.push(board.indexOf('X'));
+      } else if (board[i] != undefined && board[i] === 'O') {
+        o_array.push(board.indexOf('O'));
+      }
+      //emptying index so it will be skipped in the next iteration
+      board[i] = ''; 
+    }
+    //step 4
+    checkCombination();
+    //highlight each cell of winning combination
+    //check who won the game
+    //if playerMark == X, p1 win. and vice versa
+  };
+
+  //return index of i when count === 3 to highlight each cell in it.
+  const checkCombination = () => {
+    for(let i = 0; i < winCondition.length; i++) {
+      console.log('----');
+      let x_count = 0,
+          o_count = 0;
+      for(let j = 0; j < 3; j++) {
+        //check if all three numbers in the condition array index exists inside x or o array
+        if(x_array.includes(winCondition[i][j])) {
+          x_count++;
+        } else if (o_array.includes(winCondition[i][j])) {
+          o_count++;
+        }
+        if(x_count === 3) {
+          console.log('X-won');
+        } else if(o_count === 3) {
+          console.log('O-won');
+        }
+      }
+    }
+  }
+
+  //this function will be moved to display UI controller
+  let boardMark = 'O';
+  const updateMark = (e) => {
+    if(boardMark === 'O') {
+      boardMark = 'X';
+    } 
+    else {
+      boardMark = 'O';
+    }
+    e.target.innerHTML = boardMark;
+    board[e.target.id] = boardMark;
+
+    checkWinner(boardMark);
+  };
 
   const activateCell = (e) => {
     updateMark(e);
     deactivateCell(e.target.id);
   };
 
-  //this function will be moved to display UI controller
-  let boardMark = 'O';
-  const updateMark = (e) => {
-    if(boardMark === 'O') {
-      e.target.innerHTML ='X';
-      boardMark = 'X';
-    } 
-    else {
-      e.target.innerHTML = 'O';
-      boardMark = 'O';
-    }
-    board[e.target.id] = boardMark;
-  };
-
+  //deactivates cell after placing a marker
   const deactivateCell = (cellNum) => {
     DomElement.boardCells[cellNum].removeEventListener('click', activateCell);
     DomElement.nonSelectable(DomElement.boardCells[cellNum]);
@@ -197,4 +241,3 @@ const gameBoard = (() => {
     addBoardListeners
   }
 })();
-
