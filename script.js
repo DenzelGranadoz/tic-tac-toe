@@ -23,7 +23,7 @@ const DomElement = (() => {
   };
 
   const nonSelectable = (element) => {
-    return element.classList.toggle('taken-cell');
+    return element.classList.add('taken-cell');
   }
 
   return {
@@ -137,14 +137,7 @@ const Player = (sign, name) => {
   };
 }
 
-// if getsign == X innerhtml x else vice versa -chek
-//udpate array - chek
-//check win conditions
-//render
-//update player turn
-//change player name
-//change bot name
-//refactor code to avoid repeating
+//gameboard logic
 const gameBoard = (() => {
   const board = new Array(9);
 
@@ -158,14 +151,9 @@ const gameBoard = (() => {
     [0,4,8],
     [2,4,6]          
   ];
-  //to-do
-  //have an array go thru board indexes
-  //if X den take index put it into x array
-  //if O, vice versa step 2
-  //check win conditions from there with .Contains or something - step por
+
   let x_array = [],
       o_array = [];
-
   const checkWinner = (playerMark) => {
     for(let i = 0; i < board.length; i++) {
       if(board[i] != undefined && board[i] === 'X') {
@@ -176,34 +164,64 @@ const gameBoard = (() => {
       //emptying index so it will be skipped in the next iteration
       board[i] = ''; 
     }
-    //step 4
-    checkCombination();
-    //highlight each cell of winning combination
-    //check who won the game
-    //if playerMark == X, p1 win. and vice versa
-  };
 
-  //return index of i when count === 3 to highlight each cell in it.
-  const checkCombination = () => {
+    let winningCombination = 0;
     for(let i = 0; i < winCondition.length; i++) {
-      console.log('----');
       let x_count = 0,
           o_count = 0;
       for(let j = 0; j < 3; j++) {
         //check if all three numbers in the condition array index exists inside x or o array
-        if(x_array.includes(winCondition[i][j])) {
+        if(x_array.includes(winCondition[i][j])) { 
           x_count++;
         } else if (o_array.includes(winCondition[i][j])) {
           o_count++;
         }
         if(x_count === 3) {
-          console.log('X-won');
+          playerMark = 'X';
+          winningCombination = i;
+          gameResultDeclare(winningCombination);
         } else if(o_count === 3) {
-          console.log('O-won');
+          playerWinner = 'O';
+          winningCombination = i;
+          gameResultDeclare(winningCombination);
         }
       }
     }
-  }
+    return {
+      playerMark,
+    }
+  };
+
+  //will be moved to UI factory
+  const gameResultDeclare = (winningCombination) => {
+    removeBoardListeners();
+    removeHover();
+    highlightWinCombination(winningCombination);
+  };
+
+  const highlightWinCombination = (winningCombination) => {
+    winCombo = winCondition[winningCombination];
+    DomElement.boardCells.forEach((cell) => {
+      for(let i = 0; i < winCombo.length; i++) {
+        if(cell.id == winCombo[i]) {
+          cell.style.backgroundColor = 'limegreen';
+        }
+      }
+    });
+    //if id match with indexes with the element in an array, highlight block
+  };
+
+  //this removes hover properties when someone wins
+  const removeHover = () => {
+    DomElement.boardCells.forEach((cell) => {
+      if(cell.classList.contains('taken-cell')) {
+        cell.classList.remove('taken-cell');
+      }
+      cell.style.setProperty('opacity', 100); 
+    });
+  };
+
+  //function that returns the winning combination
 
   //this function will be moved to display UI controller
   let boardMark = 'O';
@@ -221,14 +239,21 @@ const gameBoard = (() => {
   };
 
   const activateCell = (e) => {
-    updateMark(e);
     deactivateCell(e.target.id);
+    updateMark(e);
   };
 
   //deactivates cell after placing a marker
   const deactivateCell = (cellNum) => {
     DomElement.boardCells[cellNum].removeEventListener('click', activateCell);
     DomElement.nonSelectable(DomElement.boardCells[cellNum]);
+  };
+
+  const removeBoardListeners = () => {
+    DomElement.boardCells.forEach((cell) => {
+      cell.removeEventListener('click', activateCell);
+      DomElement.nonSelectable(cell); 
+    });
   };
 
   const addBoardListeners = () => {
