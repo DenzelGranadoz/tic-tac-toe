@@ -15,9 +15,9 @@
     <h1>Tic Tac Toe</h1>
     <form action="" class="player-name-form" id="start-screen-form">
       <label for="player1">Name:</label>
-      <input type="text" id="player1-name" name="player-name" placeholder="[X] Player 1"><br>
+      <input type="text" id="player1-name" name="player-name" placeholder="[X] Player 1" maxlength="12"><br>
       <label for="player2">Name:</label>
-      <input type="text" id="player2-name" name="player-name" placeholder="[O] Player 2"><br>
+      <input type="text" id="player2-name" name="player-name" placeholder="[O] Player 2" maxlength="12"><br>
       <!-- different level of AI -->
       <div class="none" id='difficulty-container'>
         <label for="difficulty">Level:</label>
@@ -51,26 +51,26 @@
     <div class="gameplay-content">
       <div class="message-container">
         <div class="player-name-score">
-          <span>Player One: 0</span>
+          <span class="name-spans" id="player1-name-score">Player One: 0</span>
         </div>
         <div class="player-name-score">
-          <span>Player two: 0</span>
+          <span class="name-spans" id="player2-name-score">Player two: 0</span>  
         </div>
       </div>
       <div class="board-container" id="game-board">
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
-        <div class="board-cell"></div>
+        <div class="board-cell" id="0"></div>
+        <div class="board-cell" id="1"></div>
+        <div class="board-cell" id="2"></div>
+        <div class="board-cell" id="3"></div>
+        <div class="board-cell" id="4"></div>
+        <div class="board-cell" id="5"></div>
+        <div class="board-cell" id="6"></div>
+        <div class="board-cell" id="7"></div>
+        <div class="board-cell" id="8"></div>
       </div>
       <div class="gameplay-buttons">
           <button class="none" type="button" id="main-menu">Main-Menu</button>
-          <button class="none" type="button" id="play-again">Play Again</button>
+          <button class="none" type="button" id="play-again">Next Round</button>
       </div>
     </div>
   </section>
