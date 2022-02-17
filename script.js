@@ -1,4 +1,5 @@
-//DOM grab module
+console.log('hello peasant');
+
 const DomElement = (() => {
   const startScreen = document.getElementById('start-screen');
   const startScreenForm = document.getElementById('start-screen-form');
@@ -49,21 +50,21 @@ const DomElement = (() => {
   };
 })();
 
-//start screen content
+
 const MainMenu = (() => {
   // play against computer and human toggle selection
   let toggled = false;
   const toggleSelection = () => {
     DomElement.toggleNone(DomElement.labelPlayer2);
-    DomElement.toggleNone(DomElement.player2);
+    DomElement.toggleNone(DomElement.namePlayer2);
     DomElement.toggleNone(DomElement.playComputer);
     DomElement.toggleNone(DomElement.difficultyContainer);
     DomElement.toggleNone(DomElement.playHuman);
     if(DomElement.playComputer.classList.contains('none')) { 
-      DomElement.player1.style.margin = '0 0 0 10px';
+      DomElement.namePlayer1.style.margin = '0 0 0 10px';
       toggled = true //true = bot
     } else {
-      DomElement.player1.style.margin = '0 0 25px 10px';
+      DomElement.namePlayer1.style.margin = '0 0 25px 10px';
       toggled = false
     }
   };
@@ -93,11 +94,11 @@ const MainMenu = (() => {
   };
 
   const getPlayer1Name = () => {
-    return DomElement.player1.value;
+    return DomElement.namePlayer1.value;
   };
 
   const getPlayer2Name = () => {
-    return DomElement.player2.value;
+    return DomElement.namePlayer2.value;
   };
   
   return {
@@ -109,7 +110,7 @@ const MainMenu = (() => {
   }
 })();
 
-//player object
+
 const Player = (sign, name) => {
   const getSign = () => {
     return sign;
@@ -136,7 +137,7 @@ const Player = (sign, name) => {
   };
 }
 
-//gameboard logic
+
 const gameBoard = (() => {
   const board = new Array(9);
   const winCondition = [
@@ -182,11 +183,13 @@ const gameBoard = (() => {
   }
 })();
 
-//game flow
-const gameLogic = (() => {
-  const player1 = Player('X', DomElement.namePlayer1.value);
-  const player2 = Player('O', DomElement.namePlayer2.value);
 
+const gameLogic = (() => {
+  const player1 = Player('X', MainMenu.getPlayer1Name());
+  const player2 = Player('O', MainMenu.getPlayer2Name());
+
+
+  
   let x_array = [],
       o_array = [];
   const checkWinner = (playerMark) => {
@@ -213,13 +216,15 @@ const gameLogic = (() => {
         }
         if(x_count === 3) {
           playerMark = 'X';
-          winningCombination = i;
           player1.increaseScore();
+          displayController.updateNameBoard(player1.getScore(), player2.getScore());
+          winningCombination = i;
           displayController.gameResult(winningCombination);
         } else if(o_count === 3) {
           playerMark = 'O';
-          winningCombination = i;
           player2.increaseScore();
+          displayController.updateNameBoard(player1.getScore(), player2.getScore());
+          winningCombination = i;
           displayController.gameResult(winningCombination);
         }
       }
@@ -229,6 +234,7 @@ const gameLogic = (() => {
       displayController.highlightAllCells();
     }
 
+    //check if someone wins r5
     if(player1.getScore() === 5) {
       //displaycontroller.p1.getname won the game
     } //else p2.getname won
@@ -261,6 +267,7 @@ const gameLogic = (() => {
 //sort objects 
 //current player highlight and alignment
 //show reset and main menu button when round is over
+//reset board and all the counts
 //show who won the round message display
 //round win race to 5 logic
 //add ai and its events
@@ -268,6 +275,7 @@ const displayController = (() => {
   const gameResult = (winningCombination) => {
     deactivateBoard();
     highlightWinCombination(winningCombination);
+    toggleResetButtons();
   };
 
   const deactivateBoard = () => {
@@ -302,20 +310,32 @@ const displayController = (() => {
     });
   };
 
-  const updateNameBoard = () => {
-    let score = 5;
+  const updateNameBoard = (player1, player2) => {
+    if(player1 === undefined) player1 = 0;
+    if(player2 === undefined) player2 = 0;
+
     if(DomElement.namePlayer1.value !== '') {
-      DomElement.nameScorePlayer1.innerHTML = `${DomElement.namePlayer1.value}: ${score}`;
+      DomElement.nameScorePlayer1.innerHTML = `${MainMenu.getPlayer1Name()}: ${player1}`;
+    } else {
+      DomElement.nameScorePlayer1.innerHTML = `Player One: ${player1}`;
     }
     if(DomElement.namePlayer2.value !== '') {
-      DomElement.nameScorePlayer2.innerHTML = `${DomElement.namePlayer2.value}: ${score}`;
+      DomElement.nameScorePlayer2.innerHTML = `${MainMenu.getPlayer2Name()}: ${player2}`;
+    } else {
+      DomElement.nameScorePlayer2.innerHTML = `Player Two: ${player2}`;
     }
   };
+
+  const toggleResetButtons = () => {
+    DomElement.toggleNone(DomElement.openStartScreen);
+    DomElement.toggleNone(DomElement.playAgain);
+  }
 
   return {
     gameResult,
     deactivateBoard,
     highlightAllCells,
-    updateNameBoard
+    updateNameBoard,
+    toggleResetButtons
   }
 })();
