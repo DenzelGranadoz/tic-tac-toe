@@ -310,17 +310,20 @@ const gameLogic = (() => {
     o_array = [];
 
     //fix the bug with this
-    if(!player1.wonTheRound()) {
-      DomElement.nameDivPlayer1.style.backgroundColor = '#05386b';
+    if(!player1.wonTheRound()) { //make another variable hold bool
+      console.log(DomElement.nameDivPlayer1.classList);
+      DomElement.nameDivPlayer1.classList.add('clear-bg');
       player1.getTurn();
       console.log('x')
-    } else if(!player2.wonTheRound()) {
+    } else {
+      player1.wonTheRound();
       DomElement.nameDivPlayer1.style.backgroundColor = '#05386b';
       DomElement.nameDivPlayer2.style.backgroundColor = '#5cdb95';
+      console.log('o')
     }
 
     displayController.toggleResetButtons();
-    
+
     //find better way to toggle hover on and off
   };
 
@@ -379,6 +382,7 @@ const displayController = (() => {
 
   const winningBackground = (element) => {
     return element.style.backgroundColor = '#32CD3270';
+    // return element.style.backgroundColor = 'var(--board-color)';
   };
 
   const removeHover = () => {
