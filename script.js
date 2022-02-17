@@ -124,17 +124,15 @@ const Player = (sign, name) => {
     return roundWin;
   };
 
-  const updateScore = (won) => {
-    if(won) {
-      return roundWin++;
-    } 
+  const increaseScore = () => {
+    return roundWin++;
   };
 
   return {
     getSign,
     getName,
     getScore,
-    updateScore
+    increaseScore
   };
 }
 
@@ -152,67 +150,9 @@ const gameBoard = (() => {
     [2,4,6]          
   ];
 
-  let x_array = [],
-      o_array = [];
-  const checkWinner = (playerMark) => {
-    for(let i = 0; i < board.length; i++) {
-      if(board[i] != undefined && board[i] === 'X') {
-        x_array.push(board.indexOf('X'));
-      } else if (board[i] != undefined && board[i] === 'O') {
-        o_array.push(board.indexOf('O'));
-      }
-      //emptying index so it will be skipped in the next iteration
-      board[i] = ''; 
-    }
-
-    let winningCombination = 0;
-    for(let i = 0; i < winCondition.length; i++) {
-      let x_count = 0,
-          o_count = 0;
-      for(let j = 0; j < 3; j++) {
-        //check if all three numbers in the condition array index exists inside x or o array
-        if(x_array.includes(winCondition[i][j])) { 
-          x_count++;
-        } else if (o_array.includes(winCondition[i][j])) {
-          o_count++;
-        }
-        if(x_count === 3) {
-          playerMark = 'X';
-          winningCombination = i;
-          displayController.gameResult(winningCombination);
-        } else if(o_count === 3) {
-          playerWinner = 'O';
-          winningCombination = i;
-          displayController.gameResult(winningCombination);
-        }
-      }
-    }
-
-    if(x_array.length === 5 && o_array.length === 4) {
-      displayController.deactivateBoard();
-    }
-    return {
-      playerMark,
-    }
-  };
-
-  let boardMark = 'O';
-  const updateMark = (e) => {
-    if(boardMark === 'O') {
-      boardMark = 'X';
-    } 
-    else {
-      boardMark = 'O';
-    }
-    e.target.innerHTML = boardMark;
-    board[e.target.id] = boardMark;
-
-    checkWinner(boardMark);
-  };
-
   const activateCell = (e) => {
     deactivateCell(e.target.id);
-    updateMark(e);
+    gameLogic.updateMark(e);
   };
 
   //deactivates cell after placing a marker
@@ -235,18 +175,93 @@ const gameBoard = (() => {
   };
 
   return {
+    board,
     winCondition,
     addBoardListeners,
     removeBoardListeners
   }
 })();
 
+//game flow
+const gameLogic = (() => {
+  const player1 = Player('X', DomElement.namePlayer1.value);
+  const player2 = Player('O', DomElement.namePlayer2.value);
+
+  let x_array = [],
+      o_array = [];
+  const checkWinner = (playerMark) => {
+    for(let i = 0; i < gameBoard.board.length; i++) {
+      if(gameBoard.board[i] != undefined && gameBoard.board[i] === 'X') {
+        x_array.push(gameBoard.board.indexOf('X'));
+      } else if (gameBoard.board[i] != undefined && gameBoard.board[i] === 'O') {
+        o_array.push(gameBoard.board.indexOf('O'));
+      }
+      //emptying index so it will be skipped in the next iteration
+      gameBoard.board[i] = ''; 
+    }
+
+    let winningCombination;
+    for(let i = 0; i < gameBoard.winCondition.length; i++) {
+      let x_count = 0,
+          o_count = 0;
+      for(let j = 0; j < 3; j++) {
+        //check if all three numbers in the condition array index exists inside x or o array
+        if(x_array.includes(gameBoard.winCondition[i][j])) { 
+          x_count++;
+        } else if (o_array.includes(gameBoard.winCondition[i][j])) {
+          o_count++;
+        }
+        if(x_count === 3) {
+          playerMark = 'X';
+          winningCombination = i;
+          player1.increaseScore();
+          displayController.gameResult(winningCombination);
+        } else if(o_count === 3) {
+          playerMark = 'O';
+          winningCombination = i;
+          player2.increaseScore();
+          displayController.gameResult(winningCombination);
+        }
+      }
+    }
+    if(x_array.length === 5 && o_array.length === 4 && winningCombination === undefined) {
+      displayController.deactivateBoard();
+      displayController.highlightAllCells();
+    }
+
+    if(player1.getScore() === 5) {
+      //displaycontroller.p1.getname won the game
+    } //else p2.getname won
+    return {
+      playerMark,
+    }
+  };
+
+  let boardMark = 'O';
+  const updateMark = (e) => {
+    if(boardMark === 'O') {
+      boardMark = 'X';
+    } 
+    else {
+      boardMark = 'O';
+    }
+    e.target.innerHTML = boardMark;
+    gameBoard.board[e.target.id] = boardMark;
+
+    checkWinner(boardMark);
+  };
+
+  return {
+    updateMark
+  }
+})();
+
 
 //to dow 
-//add draw
-//player name display
-//current player highlight
+//sort objects 
+//current player highlight and alignment
 //show reset and main menu button when round is over
+//show who won the round message display
 //round win race to 5 logic
 //add ai and its events
 const displayController = (() => {
@@ -260,12 +275,18 @@ const displayController = (() => {
     removeHover();
   };
 
+  const highlightAllCells = () => {
+    DomElement.boardCells.forEach((cell) => {
+      cell.style.backgroundColor = 'tomato';  //change this color
+    });
+  }
+
   const highlightWinCombination = (winningCombination) => {
     let winCombo = gameBoard.winCondition[winningCombination];
     DomElement.boardCells.forEach((cell) => {
       for(let i = 0; i < winCombo.length; i++) {
         if(cell.id == winCombo[i]) {
-          cell.style.backgroundColor = 'limegreen';
+          cell.style.backgroundColor = '#32CD3270';
         }
       }
     });
@@ -294,6 +315,7 @@ const displayController = (() => {
   return {
     gameResult,
     deactivateBoard,
+    highlightAllCells,
     updateNameBoard
   }
 })();
