@@ -1,4 +1,4 @@
-console.log('hello peasant');
+console.log('whale hello der');
 
 const DomElement = (() => {
   const startScreen = document.getElementById('start-screen');
@@ -16,6 +16,7 @@ const DomElement = (() => {
   const nameDivPlayer2 = document.getElementById('player2-name-div');
   const nameScorePlayer1 = document.getElementById('player1-name-score');
   const nameScorePlayer2 = document.getElementById('player2-name-score');
+  const winnerAnnouncement = document.querySelector('winner-announcement');
   const boardGame = document.getElementById('game-board');
   const boardCells = document.querySelectorAll('.board-cell');
   const openStartScreen = document.getElementById('main-menu');
@@ -45,6 +46,7 @@ const DomElement = (() => {
     nameDivPlayer2,
     nameScorePlayer1,
     nameScorePlayer2,
+    winnerAnnouncement,
     boardGame,
     boardCells,
     openStartScreen,
@@ -69,6 +71,7 @@ const MainMenu = (() => {
       toggled = true //true = bot
     } else {
       DomElement.namePlayer1.style.margin = '0 0 25px 10px';
+      DomElement.namePlayer2.value = '';
       toggled = false
     }
   };
@@ -125,6 +128,11 @@ const Player = (sign, name) => {
     return name;
   };
 
+  let turn = false;
+  const getTurn = () => {
+    return turn = !turn;
+  }
+
   let roundWin = 0;
   const getScore = () => {
     return roundWin;
@@ -134,17 +142,18 @@ const Player = (sign, name) => {
     return roundWin++;
   };
 
-  let turn = false;
-  const getTurn = () => {
-    return turn = !turn;
+  let gameWin = false;
+  const wonTheGame = () => {
+    return gameWin = !gameWin;
   }
 
   return {
     getSign,
     getName,
+    getTurn,
     getScore,
     increaseScore,
-    getTurn
+    wonTheGame
   };
 }
 
@@ -229,11 +238,17 @@ const gameLogic = (() => {
           displayController.updateNameBoard(player1.getScore(), player2.getScore());
           winningCombination = i;
           displayController.gameResult(winningCombination);
+          displayController.toggleNameBackground(DomElement.nameDivPlayer2);
+          displayController.winningBackground(DomElement.nameDivPlayer1);
+          clearBoardArray();
         } else if(o_count === 3) {
           player2.increaseScore();
           displayController.updateNameBoard(player1.getScore(), player2.getScore());
           winningCombination = i;
           displayController.gameResult(winningCombination);
+          displayController.toggleNameBackground(DomElement.nameDivPlayer1);
+          displayController.winningBackground(DomElement.nameDivPlayer2);
+          clearBoardArray();
         }
       }
     }
@@ -243,28 +258,43 @@ const gameLogic = (() => {
     }
 
     //check if someone wins r5
+    //display message
     if(player1.getScore() === 5) {
       //displaycontroller.p1.getname won the game
     } //else p2.getname won
-
-    return {
-      playerMark,
-    }
   };
 
   const updateMark = (e) => {
     if(player1.getTurn()) {    
-      e.target.innerHTML = player1.getSign();
       gameBoard.board[e.target.id] = player1.getSign();
     } 
     else {
-      e.target.innerHTML = player2.getSign();
-      gameBoard.board[e.target.id] = player1.getSign();
+      gameBoard.board[e.target.id] = player2.getSign();
     }
     displayController.toggleNameBackground(DomElement.nameDivPlayer1);
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
 
+    render();
     checkWinner();
+  };
+
+  const clearBoardArray = () => {
+    for(let i = 0; i < 9; i++) {
+      gameBoard.board[i] = '';
+    }
+    displayController.clearBoard();
+  };
+
+  const render = () => {
+    DomElement.boardCells.forEach((cell) => {
+      for(let i = 0; i < gameBoard.board.length; i++) {
+        if(gameBoard.board[i] === player1.getSign() && i == cell.id) { 
+          cell.innerHTML = player1.getSign();
+        } else if (gameBoard.board[i] === player2.getSign() && i == cell.id) {
+          cell.innerHTML = player2.getSign();
+        }
+      }
+    });
   };
 
   return {
@@ -272,14 +302,15 @@ const gameLogic = (() => {
   }
 })();
 
+//when reseting
+//reset listeners
+//reset css properties
 
-//to dow 
-//current player highlight and alignment
+//to dow
 //reset fucntion
 //new round function
 //main menu function
 //reset board and all the counts
-//show who won the round message display
 //round win race to 5 logic
 //add ai and its events
 const displayController = (() => {
@@ -294,6 +325,10 @@ const displayController = (() => {
     removeHover();
   };
 
+  const reactivateBoard = () => {
+    gameBoard.addBoardListeners();
+  };
+
   const highlightAllCells = () => {
     DomElement.boardCells.forEach((cell) => {
       cell.style.backgroundColor = 'tomato';  //change this color
@@ -305,10 +340,14 @@ const displayController = (() => {
     DomElement.boardCells.forEach((cell) => {
       for(let i = 0; i < winCombo.length; i++) {
         if(cell.id == winCombo[i]) {
-          cell.style.backgroundColor = '#32CD3270';
+          winningBackground(cell);
         }
       }
     });
+  };
+
+  const winningBackground = (element) => {
+    return element.style.backgroundColor = '#32CD3270';
   };
 
   //this removes hover properties when someone wins
@@ -337,7 +376,7 @@ const displayController = (() => {
     }
   };
 
-  const toggleResetButtons = () => {
+  const toggleResetButtons = () => { //add event listeners to these btnz
     DomElement.toggleNone(DomElement.openStartScreen);
     DomElement.toggleNone(DomElement.playAgain);
   };
@@ -346,18 +385,27 @@ const displayController = (() => {
     return element.classList.toggle('clear-bg');
   };
 
+  const clearBoard = () => {
+    DomElement.boardCells.forEach((cell) => {
+      cell.innerHTML = '';
+      cell.style.setProperty('opacity', 50); 
+    });
+    reactivateBoard();
+  };
+
   const displayMessage = () => {
     //toggle the divs
     //toggle the message
-      //if won the game else won the round
   };
 
   return {
     gameResult,
     deactivateBoard,
     highlightAllCells,
+    winningBackground,
     updateNameBoard,
     toggleResetButtons,
-    toggleNameBackground
+    toggleNameBackground,
+    clearBoard
   }
 })();
