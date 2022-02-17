@@ -12,6 +12,8 @@ const DomElement = (() => {
   const playComputer = document.getElementById('computer');
   const playButton = document.getElementById('play');
   const gameScreen = document.getElementById('game-screen');
+  const nameDivPlayer1 = document.getElementById('player1-name-div');
+  const nameDivPlayer2 = document.getElementById('player2-name-div');
   const nameScorePlayer1 = document.getElementById('player1-name-score');
   const nameScorePlayer2 = document.getElementById('player2-name-score');
   const boardGame = document.getElementById('game-board');
@@ -39,6 +41,8 @@ const DomElement = (() => {
     playComputer,
     playButton,
     gameScreen,
+    nameDivPlayer1,
+    nameDivPlayer2,
     nameScorePlayer1,
     nameScorePlayer2,
     boardGame,
@@ -77,6 +81,7 @@ const MainMenu = (() => {
     DomElement.toggleNone(DomElement.startScreen);
     gameBoard.addBoardListeners();  
     displayController.updateNameBoard();
+    displayController.toggleNameBackground(DomElement.nameDivPlayer2);
   };
 
   DomElement.playButton.addEventListener('click', showGameScreen);
@@ -129,11 +134,17 @@ const Player = (sign, name) => {
     return roundWin++;
   };
 
+  let turn = false;
+  const getTurn = () => {
+    return turn = !turn;
+  }
+
   return {
     getSign,
     getName,
     getScore,
-    increaseScore
+    increaseScore,
+    getTurn
   };
 }
 
@@ -188,16 +199,14 @@ const gameLogic = (() => {
   const player1 = Player('X', MainMenu.getPlayer1Name());
   const player2 = Player('O', MainMenu.getPlayer2Name());
 
-
-  
   let x_array = [],
       o_array = [];
-  const checkWinner = (playerMark) => {
+  const checkWinner = () => {
     for(let i = 0; i < gameBoard.board.length; i++) {
-      if(gameBoard.board[i] != undefined && gameBoard.board[i] === 'X') {
-        x_array.push(gameBoard.board.indexOf('X'));
-      } else if (gameBoard.board[i] != undefined && gameBoard.board[i] === 'O') {
-        o_array.push(gameBoard.board.indexOf('O'));
+      if(gameBoard.board[i] != undefined && gameBoard.board[i] === player1.getSign()) { 
+        x_array.push(gameBoard.board.indexOf(player1.getSign()));
+      } else if (gameBoard.board[i] != undefined && gameBoard.board[i] === player2.getSign()) {
+        o_array.push(gameBoard.board.indexOf(player2.getSign()));
       }
       //emptying index so it will be skipped in the next iteration
       gameBoard.board[i] = ''; 
@@ -214,14 +223,13 @@ const gameLogic = (() => {
         } else if (o_array.includes(gameBoard.winCondition[i][j])) {
           o_count++;
         }
+        //create highlight both players function or just replace the name divs with a message function
         if(x_count === 3) {
-          playerMark = 'X';
           player1.increaseScore();
           displayController.updateNameBoard(player1.getScore(), player2.getScore());
           winningCombination = i;
           displayController.gameResult(winningCombination);
         } else if(o_count === 3) {
-          playerMark = 'O';
           player2.increaseScore();
           displayController.updateNameBoard(player1.getScore(), player2.getScore());
           winningCombination = i;
@@ -238,23 +246,25 @@ const gameLogic = (() => {
     if(player1.getScore() === 5) {
       //displaycontroller.p1.getname won the game
     } //else p2.getname won
+
     return {
       playerMark,
     }
   };
 
-  let boardMark = 'O';
   const updateMark = (e) => {
-    if(boardMark === 'O') {
-      boardMark = 'X';
+    if(player1.getTurn()) {    
+      e.target.innerHTML = player1.getSign();
+      gameBoard.board[e.target.id] = player1.getSign();
     } 
     else {
-      boardMark = 'O';
+      e.target.innerHTML = player2.getSign();
+      gameBoard.board[e.target.id] = player1.getSign();
     }
-    e.target.innerHTML = boardMark;
-    gameBoard.board[e.target.id] = boardMark;
+    displayController.toggleNameBackground(DomElement.nameDivPlayer1);
+    displayController.toggleNameBackground(DomElement.nameDivPlayer2);
 
-    checkWinner(boardMark);
+    checkWinner();
   };
 
   return {
@@ -264,9 +274,10 @@ const gameLogic = (() => {
 
 
 //to dow 
-//sort objects 
 //current player highlight and alignment
-//show reset and main menu button when round is over
+//reset fucntion
+//new round function
+//main menu function
 //reset board and all the counts
 //show who won the round message display
 //round win race to 5 logic
@@ -329,13 +340,24 @@ const displayController = (() => {
   const toggleResetButtons = () => {
     DomElement.toggleNone(DomElement.openStartScreen);
     DomElement.toggleNone(DomElement.playAgain);
-  }
+  };
+
+  const toggleNameBackground = (element) => {
+    return element.classList.toggle('clear-bg');
+  };
+
+  const displayMessage = () => {
+    //toggle the divs
+    //toggle the message
+      //if won the game else won the round
+  };
 
   return {
     gameResult,
     deactivateBoard,
     highlightAllCells,
     updateNameBoard,
-    toggleResetButtons
+    toggleResetButtons,
+    toggleNameBackground
   }
 })();
