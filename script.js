@@ -82,7 +82,7 @@ const MainMenu = (() => {
   //changes screen and activates board cells
   const showGameScreen = () => {
     DomElement.toggleNone(DomElement.startScreen);
-    gameBoard.addBoardListeners();  
+    gameBoard.addBoardListeners();
     displayController.updateNameBoard();
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
   };
@@ -142,6 +142,11 @@ const Player = (sign, name) => {
     return roundWin++;
   };
 
+  let roundWinner = false;
+  const wonTheRound = () => {
+    return roundWinner = !roundWinner;
+  }
+
   let gameWin = false;
   const wonTheGame = () => {
     return gameWin = !gameWin;
@@ -153,6 +158,7 @@ const Player = (sign, name) => {
     getTurn,
     getScore,
     increaseScore,
+    wonTheRound,
     wonTheGame
   };
 }
@@ -208,6 +214,32 @@ const gameLogic = (() => {
   const player1 = Player('X', MainMenu.getPlayer1Name());
   const player2 = Player('O', MainMenu.getPlayer2Name());
 
+  const updateMark = (e) => {
+    if(player1.getTurn()) {    
+      gameBoard.board[e.target.id] = player1.getSign();
+    } 
+    else {
+      gameBoard.board[e.target.id] = player2.getSign();
+    }
+    displayController.toggleNameBackground(DomElement.nameDivPlayer1);
+    displayController.toggleNameBackground(DomElement.nameDivPlayer2);
+
+    render();
+    checkWinner();
+  };
+
+  const render = () => {
+    DomElement.boardCells.forEach((cell) => {
+      for(let i = 0; i < gameBoard.board.length; i++) {
+        if(gameBoard.board[i] === player1.getSign() && i == cell.id) { 
+          cell.innerHTML = player1.getSign();
+        } else if (gameBoard.board[i] === player2.getSign() && i == cell.id) {
+          cell.innerHTML = player2.getSign();
+        }
+      }
+    });
+  };
+
   let x_array = [],
       o_array = [];
   const checkWinner = () => {
@@ -240,7 +272,7 @@ const gameLogic = (() => {
           displayController.gameResult(winningCombination);
           displayController.toggleNameBackground(DomElement.nameDivPlayer2);
           displayController.winningBackground(DomElement.nameDivPlayer1);
-          clearBoardArray();
+          player1.wonTheRound();
         } else if(o_count === 3) {
           player2.increaseScore();
           displayController.updateNameBoard(player1.getScore(), player2.getScore());
@@ -248,10 +280,12 @@ const gameLogic = (() => {
           displayController.gameResult(winningCombination);
           displayController.toggleNameBackground(DomElement.nameDivPlayer1);
           displayController.winningBackground(DomElement.nameDivPlayer2);
-          clearBoardArray();
+          player2.wonTheRound();
         }
       }
     }
+
+    //tie game
     if(x_array.length === 5 && o_array.length === 4 && winningCombination === undefined) {
       displayController.deactivateBoard();
       displayController.highlightAllCells();
@@ -259,23 +293,9 @@ const gameLogic = (() => {
 
     //check if someone wins r5
     //display message
-    if(player1.getScore() === 5) {
-      //displaycontroller.p1.getname won the game
-    } //else p2.getname won
-  };
-
-  const updateMark = (e) => {
-    if(player1.getTurn()) {    
-      gameBoard.board[e.target.id] = player1.getSign();
-    } 
-    else {
-      gameBoard.board[e.target.id] = player2.getSign();
-    }
-    displayController.toggleNameBackground(DomElement.nameDivPlayer1);
-    displayController.toggleNameBackground(DomElement.nameDivPlayer2);
-
-    render();
-    checkWinner();
+    // if(player1.getScore() === 5) {
+    //   displaycontroller.p1.getname won the game
+    // } 
   };
 
   const clearBoardArray = () => {
@@ -283,19 +303,30 @@ const gameLogic = (() => {
       gameBoard.board[i] = '';
     }
     displayController.clearBoard();
+    DomElement.boardCells.forEach((cell) => {
+      cell.style.backgroundColor = '#05386b'
+    });
+    x_array = [];
+    o_array = [];
+
+    //fix the bug with this
+    if(!player1.wonTheRound()) {
+      DomElement.nameDivPlayer1.style.backgroundColor = '#05386b';
+      player1.getTurn();
+      console.log('x')
+    } else if(!player2.wonTheRound()) {
+      DomElement.nameDivPlayer1.style.backgroundColor = '#05386b';
+      DomElement.nameDivPlayer2.style.backgroundColor = '#5cdb95';
+    }
+
+    displayController.toggleResetButtons();
+    
+    //find better way to toggle hover on and off
   };
 
-  const render = () => {
-    DomElement.boardCells.forEach((cell) => {
-      for(let i = 0; i < gameBoard.board.length; i++) {
-        if(gameBoard.board[i] === player1.getSign() && i == cell.id) { 
-          cell.innerHTML = player1.getSign();
-        } else if (gameBoard.board[i] === player2.getSign() && i == cell.id) {
-          cell.innerHTML = player2.getSign();
-        }
-      }
-    });
-  };
+  DomElement.playAgain.addEventListener('click', clearBoardArray);
+
+
 
   return {
     updateMark
@@ -350,7 +381,6 @@ const displayController = (() => {
     return element.style.backgroundColor = '#32CD3270';
   };
 
-  //this removes hover properties when someone wins
   const removeHover = () => {
     DomElement.boardCells.forEach((cell) => {
       if(cell.classList.contains('taken-cell')) {
@@ -396,6 +426,8 @@ const displayController = (() => {
   const displayMessage = () => {
     //toggle the divs
     //toggle the message
+    //playerwin has won pwinscore to plosescore
+    //toggle off next round btn
   };
 
   return {
