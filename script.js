@@ -242,6 +242,8 @@ const gameLogic = (() => {
 
   let x_array = [],
       o_array = [];
+  let tie = false;
+
   const checkWinner = () => {
     for(let i = 0; i < gameBoard.board.length; i++) {
       if(gameBoard.board[i] != undefined && gameBoard.board[i] === player1.getSign()) { 
@@ -292,9 +294,12 @@ const gameLogic = (() => {
     }
 
     //tie game
+    //have a tie variable put it into clearboardarray function to cycle thru toggles if(tie)
     if(x_array.length === 5 && o_array.length === 4 && winningCombination === undefined) {
       displayController.deactivateBoard();
       displayController.highlightAllCells();
+      displayController.toggleResetButtons();
+      tie = !tie;
     }
 
     //check if someone wins r5
@@ -310,11 +315,11 @@ const gameLogic = (() => {
     }
     displayController.clearBoard();
     DomElement.boardCells.forEach((cell) => {
-      // cell.style.backgroundColor = '#05386b' //toggle to
-      //if cell bg not equal to 05386b
-      //displayController.winningBackground
       if(cell.classList.contains('win-bg')) {
         displayController.winningBackground(cell);
+      }
+      if(tie) {
+        displayController.highlightAllCells(cell);
       }
     });
     x_array = [];
@@ -324,14 +329,18 @@ const gameLogic = (() => {
       player1.getTurn();
       displayController.toggleNameBackground(DomElement.nameDivPlayer1);
       displayController.winningBackground(DomElement.nameDivPlayer1);
-    } else {
+    } else{
       player1.wonTheRound();
       displayController.toggleNameBackground(DomElement.nameDivPlayer1);
       displayController.winningBackground(DomElement.nameDivPlayer2);
     }
-
+    if(tie) {
+      player1.getTurn();
+      displayController.toggleNameBackground(DomElement.nameDivPlayer2);
+      displayController.winningBackground(DomElement.nameDivPlayer2);
+      tie = false;
+    }
     displayController.toggleResetButtons();
-    //find better way to toggle hover on and off
   };
   DomElement.playAgain.addEventListener('click', clearBoardArray);
 
@@ -363,13 +372,9 @@ const displayController = (() => {
     removeHover();
   };
 
-  const reactivateBoard = () => {
-    gameBoard.addBoardListeners();
-  };
-
   const highlightAllCells = () => {
     DomElement.boardCells.forEach((cell) => {
-      cell.style.backgroundColor = 'tomato';  //change this color
+      cell.classList.toggle('tie-bg');
     });
   }
 
@@ -430,6 +435,10 @@ const displayController = (() => {
       cell.classList.toggle('full-opacity');
     });
     reactivateBoard();
+  };
+
+  const reactivateBoard = () => {
+    gameBoard.addBoardListeners();
   };
 
   const displayMessage = () => {
