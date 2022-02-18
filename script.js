@@ -256,7 +256,8 @@ const gameLogic = (() => {
     let winningCombination;
     for(let i = 0; i < gameBoard.winCondition.length; i++) {
       let x_count = 0,
-          o_count = 0;
+          o_count = 0,
+          winner = false;
       for(let j = 0; j < 3; j++) {
         //check if all three numbers in the condition array index exists inside x or o array
         if(x_array.includes(gameBoard.winCondition[i][j])) { 
@@ -264,7 +265,6 @@ const gameLogic = (() => {
         } else if (o_array.includes(gameBoard.winCondition[i][j])) {
           o_count++;
         }
-        //create highlight both players function or just replace the name divs with a message function
         if(x_count === 3) {
           player1.increaseScore();
           displayController.updateNameBoard(player1.getScore(), player2.getScore());
@@ -273,6 +273,7 @@ const gameLogic = (() => {
           displayController.toggleNameBackground(DomElement.nameDivPlayer2);
           displayController.winningBackground(DomElement.nameDivPlayer1);
           player1.wonTheRound();
+          winner = !winner;
         } else if(o_count === 3) {
           player2.increaseScore();
           displayController.updateNameBoard(player1.getScore(), player2.getScore());
@@ -281,7 +282,12 @@ const gameLogic = (() => {
           displayController.toggleNameBackground(DomElement.nameDivPlayer1);
           displayController.winningBackground(DomElement.nameDivPlayer2);
           player2.wonTheRound();
+          winner = !winner;
         }
+      }
+      if(winner) {
+        winner = !winner;
+        break;
       }
     }
 
@@ -304,31 +310,37 @@ const gameLogic = (() => {
     }
     displayController.clearBoard();
     DomElement.boardCells.forEach((cell) => {
-      cell.style.backgroundColor = '#05386b'
+      // cell.style.backgroundColor = '#05386b' //toggle to
+      //if cell bg not equal to 05386b
+      //displayController.winningBackground
+      if(cell.classList.contains('win-bg')) {
+        displayController.winningBackground(cell);
+      }
     });
     x_array = [];
     o_array = [];
 
-    //fix the bug with this
-    if(!player1.wonTheRound()) { //make another variable hold bool
-      console.log(DomElement.nameDivPlayer1.classList);
-      DomElement.nameDivPlayer1.classList.add('clear-bg');
+    if(!player1.wonTheRound()) {
       player1.getTurn();
-      console.log('x')
+      displayController.toggleNameBackground(DomElement.nameDivPlayer1);
+      displayController.winningBackground(DomElement.nameDivPlayer1);
     } else {
       player1.wonTheRound();
-      DomElement.nameDivPlayer1.style.backgroundColor = '#05386b';
-      DomElement.nameDivPlayer2.style.backgroundColor = '#5cdb95';
-      console.log('o')
+      displayController.toggleNameBackground(DomElement.nameDivPlayer1);
+      displayController.winningBackground(DomElement.nameDivPlayer2);
     }
 
     displayController.toggleResetButtons();
-
     //find better way to toggle hover on and off
   };
-
   DomElement.playAgain.addEventListener('click', clearBoardArray);
 
+  const reloadPage = () => {
+    location.reload();
+    return false; 
+  };
+  
+  DomElement.openStartScreen.addEventListener('click', reloadPage);
 
 
   return {
@@ -336,15 +348,7 @@ const gameLogic = (() => {
   }
 })();
 
-//when reseting
-//reset listeners
-//reset css properties
-
 //to dow
-//reset fucntion
-//new round function
-//main menu function
-//reset board and all the counts
 //round win race to 5 logic
 //add ai and its events
 const displayController = (() => {
@@ -381,7 +385,8 @@ const displayController = (() => {
   };
 
   const winningBackground = (element) => {
-    return element.style.backgroundColor = '#32CD3270';
+    // return element.style.backgroundColor = '#32CD3270';
+    return element.classList.toggle('win-bg');
     // return element.style.backgroundColor = 'var(--board-color)';
   };
 
@@ -390,7 +395,7 @@ const displayController = (() => {
       if(cell.classList.contains('taken-cell')) {
         cell.classList.remove('taken-cell');
       }
-      cell.style.setProperty('opacity', 100); 
+      cell.classList.toggle('full-opacity');
     });
   };
 
@@ -422,7 +427,7 @@ const displayController = (() => {
   const clearBoard = () => {
     DomElement.boardCells.forEach((cell) => {
       cell.innerHTML = '';
-      cell.style.setProperty('opacity', 50); 
+      cell.classList.toggle('full-opacity');
     });
     reactivateBoard();
   };
