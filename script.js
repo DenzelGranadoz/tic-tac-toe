@@ -16,7 +16,7 @@ const DomElement = (() => {
   const nameDivPlayer2 = document.getElementById('player2-name-div');
   const nameScorePlayer1 = document.getElementById('player1-name-score');
   const nameScorePlayer2 = document.getElementById('player2-name-score');
-  const winnerAnnouncement = document.querySelector('winner-announcement');
+  const winnerAnnouncement = document.getElementById('winner-announcement');
   const boardGame = document.getElementById('game-board');
   const boardCells = document.querySelectorAll('.board-cell');
   const openStartScreen = document.getElementById('main-menu');
@@ -227,9 +227,15 @@ const gameLogic = (() => {
   const player2 = Player('O');
 
   const assignName = () => {
-    player1.name = MainMenu.getPlayer1Name();
-    if(MainMenu.getPlayerType() == 'human') {
+    if(MainMenu.getPlayer1Name() != '') {
+      player1.name = MainMenu.getPlayer1Name();
+    } else {
+      player1.name = 'Player One';
+    }
+    if(MainMenu.getPlayerType() == 'human' && MainMenu.getPlayer2Name() != '') {
       player2.name = MainMenu.getPlayer2Name();
+    } else if(MainMenu.getPlayerType() == 'human' && MainMenu.getPlayer2Name() == ''){
+      player2.name = 'Player Two';
     } else {
       player2.name = MainMenu.botDifficulty();
     }
@@ -267,13 +273,18 @@ const gameLogic = (() => {
     return Math.floor(Math.random()*9);
   }
 
-  //have ai not replace human move :)
   function weakAIMove() { 
-    let aiMove;
-      do {
-          aiMove = generateRandomNum();
-      } while (gameBoard.board[aiMove] !== '')
+    let aiMove, x;
+    do {
+      aiMove = generateRandomNum();
+    } while (gameBoard.board[aiMove] !== '');
+    // DomElement.boardCells.forEach((cell) => {
+    //   if(cell.id == aiMove && cell.innerHTML !== '') {
+    //   }
+    // });
     console.log(aiMove);
+    console.log(x_array);
+    console.log(o_array);
     updateMark(aiMove);
   }
 
@@ -301,7 +312,7 @@ const gameLogic = (() => {
       } else if (gameBoard.board[i] != undefined && gameBoard.board[i] === player2.getSign()) {
         o_array.push(gameBoard.board.indexOf(player2.getSign()));
       }
-      //emptying index so it will be skipped in the next iteration
+      //emptying index so it will not be pushed in the next iteration
       gameBoard.board[i] = ''; 
     }
 
@@ -348,15 +359,16 @@ const gameLogic = (() => {
       tie = !tie;
     }
 
-    //check if someone wins r5
-    //display message
-    if(player1.getScore() === 5) {
-      console.log('p1 wins');
-    } else if (player2.getScore() === 5) {
-      console.log('p2 wins');
-    }
-
+    firstToFive();
     checkTurns();
+  };
+
+  const firstToFive = () => {
+    if(player1.getScore() === 5) {
+      displayController.displayMessage(player1.name);
+    } else if (player2.getScore() === 5) {
+      displayController.displayMessage(player2.name);
+    }
   };
 
   const gameOngoing = () => {
@@ -463,19 +475,9 @@ const displayController = (() => {
   const updateNameBoard = (p1score, p2score, p1name, p2name) => {
     if(p1score === undefined) p1score = 0;
     if(p2score === undefined) p2score = 0;
-
-    if(p1name !== '') {
-      DomElement.nameScorePlayer1.innerHTML = `${p1name}: ${p1score}`;
-    } else {
-      DomElement.nameScorePlayer1.innerHTML = `Player One: ${p1score}`;
-    }
-    if(p2name !== '') {
-      DomElement.nameScorePlayer2.innerHTML = `${p2name}: ${p2score}`;
-    } else {
-      DomElement.nameScorePlayer2.innerHTML = `Player Two: ${p2score}`;
-    }
+    DomElement.nameScorePlayer2.innerHTML = `${p2name}: ${p2score}`;
+    DomElement.nameScorePlayer1.innerHTML = `${p1name}: ${p1score}`;
   };
-  //else if bot difficulty: ${player2}`;
 
   const toggleResetButtons = () => {
     DomElement.toggleNone(DomElement.openStartScreen);
@@ -498,11 +500,12 @@ const displayController = (() => {
     gameBoard.addBoardListeners();
   };
 
-  const displayMessage = () => {
-    //toggle the divs
-    //toggle the message
-    //playerwin has won pwinscore to plosescore
-    //toggle off next round btn
+  const displayMessage = (name) => {
+    DomElement.toggleNone(DomElement.nameDivPlayer1);
+    DomElement.toggleNone(DomElement.nameDivPlayer2);
+    DomElement.toggleNone(DomElement.winnerAnnouncement);
+    DomElement.winnerAnnouncement.innerHTML = `${name} wins`
+    DomElement.toggleNone(DomElement.playAgain);
   };
 
   return {
@@ -513,6 +516,7 @@ const displayController = (() => {
     updateNameBoard,
     toggleResetButtons,
     toggleNameBackground,
-    clearBoard
+    clearBoard,
+    displayMessage
   }
 })();
