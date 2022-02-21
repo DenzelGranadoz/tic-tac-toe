@@ -76,14 +76,17 @@ const MainMenu = (() => {
     }
   };
 
+
+
   DomElement.playComputer.addEventListener('click', toggleSelection);
   DomElement.playHuman.addEventListener('click', toggleSelection);
 
   //changes screen and activates board cells
   const showGameScreen = () => {
     DomElement.toggleNone(DomElement.startScreen);
+    DomElement.toggleNone(DomElement.gameScreen);
     gameBoard.addBoardListeners();
-    displayController.updateNameBoard();
+    gameLogic.assignName();
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
   };
 
@@ -108,7 +111,7 @@ const MainMenu = (() => {
   const getPlayer2Name = () => {
     return DomElement.namePlayer2.value;
   };
-  
+
   return {
     toggleSelection,
     botDifficulty,
@@ -119,7 +122,7 @@ const MainMenu = (() => {
 })();
 
 
-const Player = (sign, name) => {
+const Player = (sign) => {
   const getSign = () => {
     return sign;
   };
@@ -179,6 +182,9 @@ const gameBoard = (() => {
 
   const activateCell = (e) => {
     deactivateCell(e.target.id);
+    //bot function that checks whos turn it is
+    //if bot turn 
+    //go do bot related functions 
     gameLogic.updateMark(e);
   };
 
@@ -210,16 +216,46 @@ const gameBoard = (() => {
 })();
 
 
-const gameLogic = (() => {
-  const player1 = Player('X', MainMenu.getPlayer1Name());
-  const player2 = Player('O', MainMenu.getPlayer2Name());
+//todo
+//bot logic
+//r5 winner display msg
 
+
+const gameLogic = (() => {
+  const player1 = Player('X');
+  const player2 = Player('O');
+  //create a function that continously run?
+  //if bot == true
+  //check who's turn it is
+  //weakAImove()
+
+  const assignName = () => {
+    player1.name = MainMenu.getPlayer1Name();
+    if(MainMenu.getPlayerType() == 'human') {
+      player2.name = MainMenu.getPlayer2Name();
+    } else {
+      player2.name = MainMenu.botDifficulty();
+    }
+    displayController.updateNameBoard(player1.getScore(), player2.getScore(), player1.name, player2.name); 
+  };
+
+  //complete assigning name values
+  //figure out a way to updatenameboard with it from the very beginning
+  //figure out a way to do it with a bot difficulty name as well
+  //create function that checks winningcombination = undefined 
+  //if undefined then continue with the game
+
+  //if winningCombination undefined?
   const updateMark = (e) => {
-    if(player1.getTurn()) {    
+    if(player1.getTurn() && e.type === 'click') {    
       gameBoard.board[e.target.id] = player1.getSign();
     } 
-    else {
+    else if(player1.getTurn() && e.type === 'click'){
+      player1.getTurn() 
       gameBoard.board[e.target.id] = player2.getSign();
+    } else {
+      player1.getTurn() 
+      gameBoard.board[e] = player2.getSign();
     }
     displayController.toggleNameBackground(DomElement.nameDivPlayer1);
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
@@ -227,6 +263,18 @@ const gameLogic = (() => {
     render();
     checkWinner();
   };
+
+  function generateRandomNum() {
+    return Math.floor(Math.random()*9);
+  }
+
+  function weakAIMove() { 
+    let aiMove;
+      do {
+          aiMove = generateRandomNum();
+      } while (gameBoard.board[aiMove] !== "")
+      updateMark(aiMove);
+  }
 
   const render = () => {
     DomElement.boardCells.forEach((cell) => {
@@ -269,18 +317,12 @@ const gameLogic = (() => {
         }
         if(x_count === 3) {
           player1.increaseScore();
-          displayController.updateNameBoard(player1.getScore(), player2.getScore());
-          winningCombination = i;
-          displayController.gameResult(winningCombination);
           displayController.toggleNameBackground(DomElement.nameDivPlayer2);
           displayController.winningBackground(DomElement.nameDivPlayer1);
           player1.wonTheRound();
           winner = !winner;
         } else if(o_count === 3) {
           player2.increaseScore();
-          displayController.updateNameBoard(player1.getScore(), player2.getScore());
-          winningCombination = i;
-          displayController.gameResult(winningCombination);
           displayController.toggleNameBackground(DomElement.nameDivPlayer1);
           displayController.winningBackground(DomElement.nameDivPlayer2);
           player2.wonTheRound();
@@ -288,13 +330,15 @@ const gameLogic = (() => {
         }
       }
       if(winner) {
+        displayController.updateNameBoard(player1.getScore(), player2.getScore(), player1.name, player2.name);
+        winningCombination = i;
+        displayController.gameResult(winningCombination);
         winner = !winner;
         break;
       }
     }
 
     //tie game
-    //have a tie variable put it into clearboardarray function to cycle thru toggles if(tie)
     if(x_array.length === 5 && o_array.length === 4 && winningCombination === undefined) {
       displayController.deactivateBoard();
       displayController.highlightAllCells();
@@ -304,11 +348,14 @@ const gameLogic = (() => {
 
     //check if someone wins r5
     //display message
-    // if(player1.getScore() === 5) {
-    //   displaycontroller.p1.getname won the game
-    // } 
+    if(player1.getScore() === 5) {
+      console.log('p1 wins');
+    } else if (player2.getScore() === 5) {
+      console.log('p2 wins');
+    }
   };
 
+  //REFACTOR THIS
   const clearBoardArray = () => {
     for(let i = 0; i < 9; i++) {
       gameBoard.board[i] = '';
@@ -338,7 +385,7 @@ const gameLogic = (() => {
       player1.getTurn();
       displayController.toggleNameBackground(DomElement.nameDivPlayer2);
       displayController.winningBackground(DomElement.nameDivPlayer2);
-      tie = false;
+      tie = !tie;
     }
     displayController.toggleResetButtons();
   };
@@ -353,13 +400,12 @@ const gameLogic = (() => {
 
 
   return {
+    assignName,
     updateMark
   }
 })();
 
-//to dow
-//round win race to 5 logic
-//add ai and its events
+
 const displayController = (() => {
   const gameResult = (winningCombination) => {
     deactivateBoard();
@@ -390,9 +436,7 @@ const displayController = (() => {
   };
 
   const winningBackground = (element) => {
-    // return element.style.backgroundColor = '#32CD3270';
     return element.classList.toggle('win-bg');
-    // return element.style.backgroundColor = 'var(--board-color)';
   };
 
   const removeHover = () => {
@@ -404,23 +448,24 @@ const displayController = (() => {
     });
   };
 
-  const updateNameBoard = (player1, player2) => {
-    if(player1 === undefined) player1 = 0;
-    if(player2 === undefined) player2 = 0;
+  const updateNameBoard = (p1score, p2score, p1name, p2name) => {
+    if(p1score === undefined) p1score = 0;
+    if(p2score === undefined) p2score = 0;
 
-    if(DomElement.namePlayer1.value !== '') {
-      DomElement.nameScorePlayer1.innerHTML = `${MainMenu.getPlayer1Name()}: ${player1}`;
+    if(p1name !== '') {
+      DomElement.nameScorePlayer1.innerHTML = `${p1name}: ${p1score}`;
     } else {
-      DomElement.nameScorePlayer1.innerHTML = `Player One: ${player1}`;
+      DomElement.nameScorePlayer1.innerHTML = `Player One: ${p1score}`;
     }
-    if(DomElement.namePlayer2.value !== '') {
-      DomElement.nameScorePlayer2.innerHTML = `${MainMenu.getPlayer2Name()}: ${player2}`;
+    if(p2name !== '') {
+      DomElement.nameScorePlayer2.innerHTML = `${p2name}: ${p2score}`;
     } else {
-      DomElement.nameScorePlayer2.innerHTML = `Player Two: ${player2}`;
+      DomElement.nameScorePlayer2.innerHTML = `Player Two: ${p2score}`;
     }
   };
+  //else if bot difficulty: ${player2}`;
 
-  const toggleResetButtons = () => { //add event listeners to these btnz
+  const toggleResetButtons = () => {
     DomElement.toggleNone(DomElement.openStartScreen);
     DomElement.toggleNone(DomElement.playAgain);
   };
