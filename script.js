@@ -87,6 +87,7 @@ const MainMenu = (() => {
     DomElement.toggleNone(DomElement.gameScreen);
     gameBoard.addBoardListeners();
     gameLogic.assignName();
+    gameLogic.checkTurns();
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
   };
 
@@ -224,10 +225,6 @@ const gameBoard = (() => {
 const gameLogic = (() => {
   const player1 = Player('X');
   const player2 = Player('O');
-  //create a function that continously run?
-  //if bot == true
-  //check who's turn it is
-  //weakAImove()
 
   const assignName = () => {
     player1.name = MainMenu.getPlayer1Name();
@@ -239,18 +236,16 @@ const gameLogic = (() => {
     displayController.updateNameBoard(player1.getScore(), player2.getScore(), player1.name, player2.name); 
   };
 
-  //complete assigning name values
-  //figure out a way to updatenameboard with it from the very beginning
-  //figure out a way to do it with a bot difficulty name as well
-  //create function that checks winningcombination = undefined 
-  //if undefined then continue with the game
+  const checkTurns = () => {
+    if(!player2.getTurn()) {
+      gameOngoing();
+    }
+  };
 
-  //if winningCombination undefined?
   const updateMark = (e) => {
     if(player1.getTurn() && e.type === 'click') {    
       gameBoard.board[e.target.id] = player1.getSign();
-    } 
-    else if(player1.getTurn() && e.type === 'click'){
+    } else if(player1.getTurn() && e.type === 'click'){
       player1.getTurn() 
       gameBoard.board[e.target.id] = player2.getSign();
     } else {
@@ -260,20 +255,26 @@ const gameLogic = (() => {
     displayController.toggleNameBackground(DomElement.nameDivPlayer1);
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
 
+    //if game done 
+    //removeListeners
+    //return;
     render();
     checkWinner();
+    //
   };
 
   function generateRandomNum() {
     return Math.floor(Math.random()*9);
   }
 
+  //have ai not replace human move :)
   function weakAIMove() { 
     let aiMove;
       do {
           aiMove = generateRandomNum();
-      } while (gameBoard.board[aiMove] !== "")
-      updateMark(aiMove);
+      } while (gameBoard.board[aiMove] !== '')
+    console.log(aiMove);
+    updateMark(aiMove);
   }
 
   const render = () => {
@@ -291,6 +292,7 @@ const gameLogic = (() => {
   let x_array = [],
       o_array = [];
   let tie = false;
+  let winningCombination = '';
 
   const checkWinner = () => {
     for(let i = 0; i < gameBoard.board.length; i++) {
@@ -303,7 +305,6 @@ const gameLogic = (() => {
       gameBoard.board[i] = ''; 
     }
 
-    let winningCombination;
     for(let i = 0; i < gameBoard.winCondition.length; i++) {
       let x_count = 0,
           o_count = 0,
@@ -333,6 +334,7 @@ const gameLogic = (() => {
         displayController.updateNameBoard(player1.getScore(), player2.getScore(), player1.name, player2.name);
         winningCombination = i;
         displayController.gameResult(winningCombination);
+        winningCombination = '';
         winner = !winner;
         break;
       }
@@ -352,6 +354,14 @@ const gameLogic = (() => {
       console.log('p1 wins');
     } else if (player2.getScore() === 5) {
       console.log('p2 wins');
+    }
+
+    checkTurns();
+  };
+
+  const gameOngoing = () => {
+    if(winningCombination == '' && MainMenu.getPlayerType() === 'bot') {
+      weakAIMove();
     }
   };
 
@@ -381,6 +391,7 @@ const gameLogic = (() => {
       displayController.toggleNameBackground(DomElement.nameDivPlayer1);
       displayController.winningBackground(DomElement.nameDivPlayer2);
     }
+
     if(tie) {
       player1.getTurn();
       displayController.toggleNameBackground(DomElement.nameDivPlayer2);
@@ -401,6 +412,7 @@ const gameLogic = (() => {
 
   return {
     assignName,
+    checkTurns,
     updateMark
   }
 })();
