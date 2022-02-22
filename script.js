@@ -361,12 +361,6 @@ const gameLogic = (() => {
   //bot related functions 
   const checkBotTurn = () => {
     if(x_array.length > o_array.length && MainMenu.getPlayerType() === 'bot') {
-      performBotMove();
-    }
-  };
-
-  const performBotMove = () => {
-    if(MainMenu.botDifficulty() == 'Easy Bot') {
       easyAIMove();
     }
   };
@@ -391,6 +385,7 @@ const gameLogic = (() => {
       }
     })
   };
+
 
   const nextRound = () => {
     clearArrays();
@@ -425,18 +420,16 @@ const gameLogic = (() => {
   const resetTurn = () => {
     if(!player1.wonTheRound()) {
       player1.getTurn();
-      displayController.toggleNameBackground(DomElement.nameDivPlayer1);
-      displayController.winningBackground(DomElement.nameDivPlayer1);
+      toggleWinBg(DomElement.nameDivPlayer1, DomElement.nameDivPlayer1);
+
     } else{
       player1.wonTheRound();
-      displayController.toggleNameBackground(DomElement.nameDivPlayer1);
-      displayController.winningBackground(DomElement.nameDivPlayer2);
+      toggleWinBg(DomElement.nameDivPlayer1, DomElement.nameDivPlayer2);
     }
 
     if(tie) {
       player1.getTurn();
-      displayController.toggleNameBackground(DomElement.nameDivPlayer2);
-      displayController.winningBackground(DomElement.nameDivPlayer2);
+      toggleWinBg(DomElement.nameDivPlayer2, DomElement.nameDivPlayer2);
       tie = !tie;
     }
   };
@@ -454,7 +447,6 @@ const gameLogic = (() => {
     updateMark
   }
 })();
-
 
 const displayController = (() => {
   const gameResult = (winningCombination) => {
@@ -546,5 +538,3 @@ const displayController = (() => {
     displayMessage
   }
 })();
-
-//minimax algo
