@@ -22,10 +22,10 @@
       <div class="none" id='difficulty-container'>
         <label for="difficulty">Level:</label>
         <select id="difficulty" name="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="unbeatable">Unbeatable</option>
-          <option value="asian">Asian</option>
+          <option value="Easy Bot">Easy</option>
+          <option value="Medium Bot">Medium</option>
+          <option value="Unbeatable Bot">Unbeatable</option>
+          <option value="Asian Bot">Asian</option>
         </select>
       </div>
       <div class="form-buttons" id="form-play-buttons">
@@ -44,17 +44,20 @@
       <div class="start-menu-border-edge"></div>
     </div>
   </section>
-  <section class="gameplay-menu" id="game-screen">
+  <section class="gameplay-menu none" id="game-screen">
     <header class="gameplay-menu-header">
       <h1>Tic Tac Toe</h1>
     </header>
     <div class="gameplay-content">
       <div class="message-container">
-        <div class="player-name-score">
-          <span class="name-spans" id="player1-name-score">Player One: 0</span>
+        <div class="player-name-scores" id="player1-name-div">
+          <span class="name-spans" id="player1-name-score"></span>
         </div>
-        <div class="player-name-score">
-          <span class="name-spans" id="player2-name-score">Player two: 0</span>  
+        <div class="player-name-scores" id="player2-name-div">
+          <span class="name-spans" id="player2-name-score"></span>  
+        </div>
+        <div class="win-message none" id="winner-announcement">
+          Win
         </div>
       </div>
       <div class="board-container" id="game-board">
