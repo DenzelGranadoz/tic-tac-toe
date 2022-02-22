@@ -360,7 +360,7 @@ const gameLogic = (() => {
 
   //bot related functions 
   const checkBotTurn = () => {
-    if(!player2.getTurn() && MainMenu.getPlayerType() === 'bot') {
+    if(x_array.length > o_array.length && MainMenu.getPlayerType() === 'bot') {
       performBotMove();
     }
   };
@@ -547,6 +547,4 @@ const displayController = (() => {
   }
 })();
 
-//to do bot turn check bug
-//refactor code
 //minimax algo
