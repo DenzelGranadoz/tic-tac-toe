@@ -17,7 +17,6 @@ const DomElement = (() => {
   const nameScorePlayer1 = document.getElementById('player1-name-score');
   const nameScorePlayer2 = document.getElementById('player2-name-score');
   const winnerAnnouncement = document.getElementById('winner-announcement');
-  const boardGame = document.getElementById('game-board');
   const boardCells = document.querySelectorAll('.board-cell');
   const openStartScreen = document.getElementById('main-menu');
   const playAgain = document.getElementById('play-again');
@@ -32,7 +31,6 @@ const DomElement = (() => {
 
   return {
     startScreen,
-    startScreenForm,
     labelPlayer2,
     namePlayer1,
     namePlayer2,
@@ -47,7 +45,6 @@ const DomElement = (() => {
     nameScorePlayer1,
     nameScorePlayer2,
     winnerAnnouncement,
-    boardGame,
     boardCells,
     openStartScreen,
     playAgain,
@@ -76,18 +73,16 @@ const MainMenu = (() => {
     }
   };
 
-
-
   DomElement.playComputer.addEventListener('click', toggleSelection);
   DomElement.playHuman.addEventListener('click', toggleSelection);
 
-  //changes screen and activates board cells
+  //changes screen and starts the flow of the game
   const showGameScreen = () => {
     DomElement.toggleNone(DomElement.startScreen);
     DomElement.toggleNone(DomElement.gameScreen);
     gameBoard.addBoardListeners();
-    gameLogic.assignName();
-    gameLogic.checkTurns();
+    gameLogic.assignNames();
+    gameLogic.checkBotTurn();
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
   };
 
@@ -182,11 +177,10 @@ const gameBoard = (() => {
   ];
 
   const activateCell = (e) => {
-    deactivateCell(e.target.id);
+    deactivateCell(e.target.id); //deactivates cell after placing a marker
     gameLogic.updateMark(e);
   };
 
-  //deactivates cell after placing a marker
   const deactivateCell = (cellNum) => {
     DomElement.boardCells[cellNum].removeEventListener('click', activateCell);
     DomElement.nonSelectable(DomElement.boardCells[cellNum]);
@@ -218,25 +212,27 @@ const gameLogic = (() => {
   const player1 = Player('X');
   const player2 = Player('O');
 
-  const assignName = () => {
+  const assignNames = () => {
+    assignPlayer1Name();
+    assignPlayer2Name();
+    displayController.updateNameBoard(player1.getScore(), player2.getScore(), player1.name, player2.name); 
+  };
+
+  const assignPlayer1Name = () => {
     if(MainMenu.getPlayer1Name() != '') {
       player1.name = MainMenu.getPlayer1Name();
     } else {
       player1.name = 'Player One';
     }
-    if(MainMenu.getPlayerType() == 'human' && MainMenu.getPlayer2Name() != '') {
+  };
+
+  const assignPlayer2Name = () => {
+    if(MainMenu.getPlayerType() == 'human' && MainMenu.getPlayer2Name() != ''){
       player2.name = MainMenu.getPlayer2Name();
     } else if(MainMenu.getPlayerType() == 'human' && MainMenu.getPlayer2Name() == ''){
       player2.name = 'Player Two';
     } else {
       player2.name = MainMenu.botDifficulty();
-    }
-    displayController.updateNameBoard(player1.getScore(), player2.getScore(), player1.name, player2.name); 
-  };
-
-  const checkTurns = () => {
-    if(!player2.getTurn()) {
-      gameOngoing();
     }
   };
 
@@ -250,16 +246,16 @@ const gameLogic = (() => {
       player1.getTurn() 
       gameBoard.board[e] = player2.getSign();
     }
-    displayController.toggleNameBackground(DomElement.nameDivPlayer1);
-    displayController.toggleNameBackground(DomElement.nameDivPlayer2);
 
+    togglePlayerBackgrounds();
     render();
     checkWinner();
   };
 
-  function generateRandomNum() {
-    return Math.floor(Math.random()*9);
-  }
+  const togglePlayerBackgrounds = () => {
+    displayController.toggleNameBackground(DomElement.nameDivPlayer1);
+    displayController.toggleNameBackground(DomElement.nameDivPlayer2);
+  };
 
   const render = () => {
     DomElement.boardCells.forEach((cell) => {
@@ -272,29 +268,15 @@ const gameLogic = (() => {
       }
     });
   };
-
-
   
   let x_array = [],
       o_array = [];
   let tie = false;
-  let winningCombination = '';
-  let w = false;
   let secondBoard = new Array(9);
-
   const checkWinner = () => {
-    for(let i = 0; i < gameBoard.board.length; i++) {
-      if(gameBoard.board[i] != undefined && gameBoard.board[i] === player1.getSign()) {
-        x_array.push(gameBoard.board.indexOf(player1.getSign()));
-      } else if (gameBoard.board[i] != undefined && gameBoard.board[i] === player2.getSign()) {
-        o_array.push(gameBoard.board.indexOf(player2.getSign()));
-      }
-      if(gameBoard.board[i] != '') {
-        secondBoard[i] = gameBoard.board[i];
-      }
-      //emptying index so it will not be pushed in the next iteration
-      gameBoard.board[i] = ''; 
-    }
+    let gameEnd = false;
+    let winningCombination = '';
+    separateArrays();
 
     for(let i = 0; i < gameBoard.winCondition.length; i++) {
       let x_count = 0,
@@ -309,15 +291,13 @@ const gameLogic = (() => {
         }
         if(x_count === 3) {
           player1.increaseScore();
-          displayController.toggleNameBackground(DomElement.nameDivPlayer2);
-          displayController.winningBackground(DomElement.nameDivPlayer1);
           player1.wonTheRound();
+          toggleWinBg(DomElement.nameDivPlayer2, DomElement.nameDivPlayer1);
           winner = !winner;
         } else if(o_count === 3) {
           player2.increaseScore();
-          displayController.toggleNameBackground(DomElement.nameDivPlayer1);
-          displayController.winningBackground(DomElement.nameDivPlayer2);
           player2.wonTheRound();
+          toggleWinBg(DomElement.nameDivPlayer1, DomElement.nameDivPlayer2);
           winner = !winner;
         }
       }
@@ -327,27 +307,47 @@ const gameLogic = (() => {
         displayController.gameResult(winningCombination);
         winningCombination = '';
         winner = !winner;
-        w = !w
-        break;
+        gameEnd = !gameEnd;
+        firstToFive();
+        return;
       } 
     }
-    
+  
     //tie game
     if(x_array.length === 5 && o_array.length === 4 && winningCombination === '') {
-      console.log('hel')
       displayController.deactivateBoard();
       displayController.highlightAllCells();
       displayController.toggleResetButtons();
       tie = !tie;
-    }
-
-    firstToFive();
-    if(w) {
-      w = !w;
       return;
     }
 
-    checkTurns(); 
+    //check if human has won so bot won't have to check turn
+    if(gameEnd) {
+      gameEnd = !gameEnd;
+      return;
+    }
+    checkBotTurn(); 
+  };
+
+  const separateArrays = () => {
+    for(let i = 0; i < gameBoard.board.length; i++) {
+      if(gameBoard.board[i] != undefined && gameBoard.board[i] === player1.getSign()) {
+        x_array.push(gameBoard.board.indexOf(player1.getSign()));
+      } else if (gameBoard.board[i] != undefined && gameBoard.board[i] === player2.getSign()) {
+        o_array.push(gameBoard.board.indexOf(player2.getSign()));
+      }
+      if(gameBoard.board[i] != '') {
+        secondBoard[i] = gameBoard.board[i];
+      }
+      //emptying index so it will not be pushed in the next iteration
+      gameBoard.board[i] = ''; 
+    }
+  };
+
+  const toggleWinBg = (namebg, winbg) => {
+    displayController.toggleNameBackground(namebg);
+    displayController.winningBackground(winbg);
   };
 
   const firstToFive = () => {
@@ -358,32 +358,60 @@ const gameLogic = (() => {
     }
   };
 
-  const gameOngoing = () => {
-    if(MainMenu.getPlayerType() === 'bot') {
-      weakAIMove();
+  //bot related functions 
+  const checkBotTurn = () => {
+    if(!player2.getTurn() && MainMenu.getPlayerType() === 'bot') {
+      performBotMove();
     }
   };
 
-  function weakAIMove() { 
+  const performBotMove = () => {
+    if(MainMenu.botDifficulty() == 'Easy Bot') {
+      easyAIMove();
+    }
+  };
+
+  const RandomNum = () => {
+    return Math.floor(Math.random()*9);
+  };
+
+  const easyAIMove = () => { 
     let aiMove;
     do {
-      aiMove = generateRandomNum();
+      aiMove = RandomNum();
     } while(secondBoard[aiMove] !== undefined);
+    deactivateBotMove(aiMove);
+    updateMark(aiMove);
+  };
+
+  const deactivateBotMove = (aiMove) => {
     DomElement.boardCells.forEach((cell) => {
       if(cell.id == aiMove) {
         gameBoard.deactivateCell(aiMove);
       }
     })
-    updateMark(aiMove);
-  }
+  };
 
-  //REFACTOR THIS
-  const clearBoardArray = () => {
+  const nextRound = () => {
+    clearArrays();
+    toggleCellBg();
+    displayController.clearBoard();
+    resetTurn();
+    displayController.toggleResetButtons();
+  };
+  
+  DomElement.playAgain.addEventListener('click', nextRound);
+
+  const clearArrays = () => {
     for(let i = 0; i < 9; i++) {
       gameBoard.board[i] = '';
       secondBoard[i] = undefined;
     }
-    displayController.clearBoard();
+    x_array = [];
+    o_array = [];
+  };
+
+  const toggleCellBg = () => {
     DomElement.boardCells.forEach((cell) => {
       if(cell.classList.contains('win-bg')) {
         displayController.winningBackground(cell);
@@ -392,9 +420,9 @@ const gameLogic = (() => {
         displayController.highlightAllCells(cell);
       }
     });
-    x_array = [];
-    o_array = [];
+  };
 
+  const resetTurn = () => {
     if(!player1.wonTheRound()) {
       player1.getTurn();
       displayController.toggleNameBackground(DomElement.nameDivPlayer1);
@@ -411,9 +439,7 @@ const gameLogic = (() => {
       displayController.winningBackground(DomElement.nameDivPlayer2);
       tie = !tie;
     }
-    displayController.toggleResetButtons();
   };
-  DomElement.playAgain.addEventListener('click', clearBoardArray);
 
   const reloadPage = () => {
     location.reload();
@@ -422,10 +448,9 @@ const gameLogic = (() => {
   
   DomElement.openStartScreen.addEventListener('click', reloadPage);
 
-
   return {
-    assignName,
-    checkTurns,
+    assignNames,
+    checkBotTurn,
     updateMark
   }
 })();
@@ -443,12 +468,6 @@ const displayController = (() => {
     removeHover();
   };
 
-  const highlightAllCells = () => {
-    DomElement.boardCells.forEach((cell) => {
-      cell.classList.toggle('tie-bg');
-    });
-  }
-
   const highlightWinCombination = (winningCombination) => {
     let winCombo = gameBoard.winCondition[winningCombination];
     DomElement.boardCells.forEach((cell) => {
@@ -460,9 +479,16 @@ const displayController = (() => {
     });
   };
 
-  const winningBackground = (element) => {
-    return element.classList.toggle('win-bg');
+  const toggleResetButtons = () => {
+    DomElement.toggleNone(DomElement.openStartScreen);
+    DomElement.toggleNone(DomElement.playAgain);
   };
+
+  const highlightAllCells = () => {
+    DomElement.boardCells.forEach((cell) => {
+      cell.classList.toggle('tie-bg');
+    });
+  }
 
   const removeHover = () => {
     DomElement.boardCells.forEach((cell) => {
@@ -480,9 +506,8 @@ const displayController = (() => {
     DomElement.nameScorePlayer1.innerHTML = `${p1name}: ${p1score}`;
   };
 
-  const toggleResetButtons = () => {
-    DomElement.toggleNone(DomElement.openStartScreen);
-    DomElement.toggleNone(DomElement.playAgain);
+  const winningBackground = (element) => {
+    return element.classList.toggle('win-bg');
   };
 
   const toggleNameBackground = (element) => {
@@ -521,3 +546,7 @@ const displayController = (() => {
     displayMessage
   }
 })();
+
+//to do bot turn check bug
+//refactor code
+//minimax algo
