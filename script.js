@@ -183,9 +183,6 @@ const gameBoard = (() => {
 
   const activateCell = (e) => {
     deactivateCell(e.target.id);
-    //bot function that checks whos turn it is
-    //if bot turn 
-    //go do bot related functions 
     gameLogic.updateMark(e);
   };
 
@@ -211,16 +208,11 @@ const gameBoard = (() => {
   return {
     board,
     winCondition,
+    deactivateCell,
     addBoardListeners,
     removeBoardListeners
   }
 })();
-
-
-//todo
-//bot logic
-//r5 winner display msg
-
 
 const gameLogic = (() => {
   const player1 = Player('X');
@@ -261,31 +253,12 @@ const gameLogic = (() => {
     displayController.toggleNameBackground(DomElement.nameDivPlayer1);
     displayController.toggleNameBackground(DomElement.nameDivPlayer2);
 
-    //if game done 
-    //removeListeners
-    //return;
     render();
     checkWinner();
-    //
   };
 
   function generateRandomNum() {
     return Math.floor(Math.random()*9);
-  }
-
-  function weakAIMove() { 
-    let aiMove, x;
-    do {
-      aiMove = generateRandomNum();
-    } while (gameBoard.board[aiMove] !== '');
-    // DomElement.boardCells.forEach((cell) => {
-    //   if(cell.id == aiMove && cell.innerHTML !== '') {
-    //   }
-    // });
-    console.log(aiMove);
-    console.log(x_array);
-    console.log(o_array);
-    updateMark(aiMove);
   }
 
   const render = () => {
@@ -300,17 +273,24 @@ const gameLogic = (() => {
     });
   };
 
+
+  
   let x_array = [],
       o_array = [];
   let tie = false;
   let winningCombination = '';
+  let w = false;
+  let secondBoard = new Array(9);
 
   const checkWinner = () => {
     for(let i = 0; i < gameBoard.board.length; i++) {
-      if(gameBoard.board[i] != undefined && gameBoard.board[i] === player1.getSign()) { 
+      if(gameBoard.board[i] != undefined && gameBoard.board[i] === player1.getSign()) {
         x_array.push(gameBoard.board.indexOf(player1.getSign()));
       } else if (gameBoard.board[i] != undefined && gameBoard.board[i] === player2.getSign()) {
         o_array.push(gameBoard.board.indexOf(player2.getSign()));
+      }
+      if(gameBoard.board[i] != '') {
+        secondBoard[i] = gameBoard.board[i];
       }
       //emptying index so it will not be pushed in the next iteration
       gameBoard.board[i] = ''; 
@@ -347,12 +327,14 @@ const gameLogic = (() => {
         displayController.gameResult(winningCombination);
         winningCombination = '';
         winner = !winner;
+        w = !w
         break;
-      }
+      } 
     }
-
+    
     //tie game
-    if(x_array.length === 5 && o_array.length === 4 && winningCombination === undefined) {
+    if(x_array.length === 5 && o_array.length === 4 && winningCombination === '') {
+      console.log('hel')
       displayController.deactivateBoard();
       displayController.highlightAllCells();
       displayController.toggleResetButtons();
@@ -360,7 +342,12 @@ const gameLogic = (() => {
     }
 
     firstToFive();
-    checkTurns();
+    if(w) {
+      w = !w;
+      return;
+    }
+
+    checkTurns(); 
   };
 
   const firstToFive = () => {
@@ -372,15 +359,29 @@ const gameLogic = (() => {
   };
 
   const gameOngoing = () => {
-    if(winningCombination == '' && MainMenu.getPlayerType() === 'bot') {
+    if(MainMenu.getPlayerType() === 'bot') {
       weakAIMove();
     }
   };
+
+  function weakAIMove() { 
+    let aiMove;
+    do {
+      aiMove = generateRandomNum();
+    } while(secondBoard[aiMove] !== undefined);
+    DomElement.boardCells.forEach((cell) => {
+      if(cell.id == aiMove) {
+        gameBoard.deactivateCell(aiMove);
+      }
+    })
+    updateMark(aiMove);
+  }
 
   //REFACTOR THIS
   const clearBoardArray = () => {
     for(let i = 0; i < 9; i++) {
       gameBoard.board[i] = '';
+      secondBoard[i] = undefined;
     }
     displayController.clearBoard();
     DomElement.boardCells.forEach((cell) => {
